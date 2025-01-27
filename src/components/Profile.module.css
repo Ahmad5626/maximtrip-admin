@@ -1,0 +1,32 @@
+.browse {
+    display: inline-block;
+    position: absolute;
+    right: 35px;
+    bottom: 40px;
+    cursor: pointer;
+}
+
+.browseFile {
+    width: 34px;
+    height: 34px;
+    position: absolute;
+    text-align: right;
+    opacity: 0;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.browseFileImg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    border: 3px solid white;
+    width: 36px;
+    height: 36px;
+    top: 0;
+    left: 0;
+    background-color: #FFC004;
+    color: white;
+    border-radius: 50%;
+}

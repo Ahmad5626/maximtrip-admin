@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: whitesmoke;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.customContainer {
+    width: 85%;
+    max-width: 1280px;
+    margin-inline: auto;
+}
+
+.container-btn-file {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    background-color: #307750;
+    color: #fff;
+    border-style: none;
+    padding: 0.4em 1.5em;
+    border-radius: 0.5em;
+    overflow: hidden;
+    z-index: 1;
+    transition: all 250ms;
+}
+
+.container-btn-file input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.container-btn-file>svg {
+    margin-right: 1em;
+}
+
+.container-btn-file::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 0;
+    border-radius: 0.5em;
+    background-color: #469b61;
+    z-index: -1;
+    transition: all 350ms;
+}
+
+.aadharBtn {
+    background-color: orangered;
+}
+
+.aadharBtn::before {
+    background-color: red;
+}
+
+.panBtn {
+    background-color: rgb(0, 0, 200);
+}
+
+.panBtn::before {
+    background-color: rgb(0, 0, 250);
+}
+
+.container-btn-file:hover::before {
+    width: 100%;
+}
+
+.cropDialogCont {
+    height: 100dvh;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.crop-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    max-width: 400px;
+    height: 360px;
+    background: white;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.crop-dialog .controls {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 10;
+    position: absolute;
+    bottom: 0;
+}
+
+.crop-dialog button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.crop-dialog button:hover {
+    background-color: #0056b3;
+}
+
+@media (width<568px) {
+    .customContainer {
+        width: 95%;
+    }
+
+    .crop-dialog {
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Popup overlay */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* Popup content */
+  .popup {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+  
+  /* Close button inside the popup */
+  .close-popup-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  .send-popup-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    background-color:#0056b3;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition:0.5s;
+  }
+  .send-popup-btn:hover{
+    background-color:#0b2038;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  }
+  .close-popup-btn:hover {
+    background-color: #a71d2a;
+  }
