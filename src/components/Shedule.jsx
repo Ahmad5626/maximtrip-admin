@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const Shedule = () => {
   const id=localStorage.getItem("id");
   const [zoomMeetingData,setZoomMeetingData]=useState()
-  const {tutordatalist,studentdata}=useAuth()
+  const {tutordatalist,allUserData}=useAuth()
   
   useEffect(() => { 
 
@@ -18,7 +18,7 @@ const Shedule = () => {
       }
     })}
 
-{studentdata.map((student,index)=>{
+{allUserData.map((student,index)=>{
      
   if(student._id==id){
     

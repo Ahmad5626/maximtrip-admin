@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/authContext';
 import styles from './Profile.module.css'
-import ProfileUpload from './ProfileUpload/ProfileUpload';
+// import ProfileUpload from './ProfileUpload/ProfileUpload';
 import Loader from './Loader/Loader';
 
 function Profile() {
-    const [studentdata,setStudentData]=useState([]) 
+    const [allUserData,setallUserData]=useState([]) 
     const [teacherdata,setTeacherData]=useState([]) 
   const id= localStorage.getItem("id")
 //   console.log(id);
@@ -15,14 +15,14 @@ function Profile() {
     try{
       const role=  localStorage.getItem("role")
       if(role=="student"){
-        const response=await fetch('https://gradetopper-2.onrender.com/students')
+        const response=await fetch('http://localhost:4100/students')
         const data=await response.json()
         // console.log(data)
-        setStudentData(data)
+        setallUserData(data)
       }
 
       if(role=="tutor"){
-        const response=await fetch('https://gradetopper-2.onrender.com/alltutors')
+        const response=await fetch('http://localhost:4100/alltutors')
         const data=await response.json()
         // console.log(data)
         setTeacherData(data)
@@ -34,7 +34,7 @@ function Profile() {
    }
    getData()
   },[])
-  console.log(studentdata);
+  console.log(allUserData);
   
     return (
         <>
@@ -56,7 +56,7 @@ function Profile() {
                             </button> */}
                         </div>
                     </div>
-                    {studentdata.map((tutot) => {
+                    {allUserData.map((tutot) => {
                        if(tutot._id===id){
                            return (
                             <div className='mt-4 space-y-2'>

@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/authContext";
 import { Link } from "react-router-dom";
 import { Toaster, toast } from 'sonner';
 function MoneyBlockerFinder() {
- const {deleteTutor,tutordatalist}=useAuth()
+ 
 
     
 

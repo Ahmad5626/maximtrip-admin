@@ -3,16 +3,17 @@ import axios from "axios";
 import { Toaster, toast } from "sonner";
 import { useAuth } from "../contexts/authContext";
 const Upcommingclass = () => {
-  const { studentdata } = useAuth();
+  const { allUserData } = useAuth();
   const [tutordata, setTutordata] = useState([]);
-  const [meetingStudentData, setMeetingStudentData] = useState([]);
+  // console.log(tutordata);
+  const [meetingallUserData, setMeetingallUserData] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     const id = localStorage.getItem("id");
     const getCourseData = async () => {
-      const courseData = await fetch("https://gradetopper-2.onrender.com/allcourses");
+      const courseData = await fetch("http://localhost:4100/allcourses");
       const courseData2 = await courseData.json();
-      const Tutordata = await fetch("https://gradetopper-2.onrender.com/alltutors");
+      const Tutordata = await fetch("http://localhost:4100/alltutors");
       const Tutordata2 = await Tutordata.json();
       {
         Tutordata2.map((Tutordata2, index) => {
@@ -22,9 +23,13 @@ const Upcommingclass = () => {
             {
               Tutordata2.courseData.map((Tutordata2) => {
                 {
+                  console.log(courseData2);
+                  
                   courseData2.map((courseData2) => {
                     if (courseData2._id == Tutordata2) {
                       setTutordata(courseData2);
+                      // console.log(courseData2);
+                      
                     }
                   });
                 }
@@ -40,11 +45,11 @@ const Upcommingclass = () => {
   }, []);
 
 useEffect(() => {
-  {studentdata.map((studentdata, index) => {
-    if(studentdata.email==tutordata.email){
-      setMeetingStudentData(tutordata)
+  {allUserData.map((allUserData, index) => {
+    if(allUserData.email==tutordata.email){
+      setMeetingallUserData(tutordata)
     }else{
-      console.log("not found");
+      // console.log("not found");
       
     }
     
@@ -85,7 +90,7 @@ useEffect(() => {
       
 
       const id = localStorage.getItem("id");
-      const response = await fetch("https://gradetopper-2.onrender.com/create-meeting", {
+      const response = await fetch("http://localhost:4100/create-meeting", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
