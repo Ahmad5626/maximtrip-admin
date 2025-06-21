@@ -1,11 +1,11 @@
+import { baseApi } from "../utils/constant";
 
-import { baseAPI } from "../utils";
 export const uploadFile = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
 
   try {
-    const res = await fetch(`${baseAPI}/api/upload`, {
+    const res = await fetch(`${baseApi}/api/upload`, {
       method: "POST",
       body: formData,
     });

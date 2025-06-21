@@ -1,4 +1,5 @@
-import { baseAPI } from "../utils";
+import { baseApi } from "../utils/constant";
+
 export const createDestinations = async (formData) => {
     try {
         const data = await fetch(`${baseAPI}/v1/api/create-destination`, {
@@ -17,7 +18,7 @@ export const createDestinations = async (formData) => {
 
 export const getDestinations = async () => {
     try {
-        const data = await fetch(`${baseAPI}/v1/api/get-destination`);
+        const data = await fetch(`${baseApi}/v1/api/get-destination`);
         const res = await data.json();
         return res;
     } catch (error) {

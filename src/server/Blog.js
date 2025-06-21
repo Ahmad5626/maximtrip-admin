@@ -1,9 +1,8 @@
+import { baseApi } from "../utils/constant";
 
-// const baseAPI = "http://localhost:7000";
-import { baseAPI } from "../utils";
 export const createBlog = async (formData) => {
     try {
-        const data = await fetch(`${baseAPI}/v1/api/create-blog`, {
+        const data = await fetch(`${baseApi}/v1/api/create-blog`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

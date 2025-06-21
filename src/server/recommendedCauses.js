@@ -1,8 +1,8 @@
-import { baseAPI } from "../utils";
+import { baseApi } from "../utils/constant";
 
 export const createRecommendedCauses = async (data) => {
     try {
-        const response = await fetch(`${baseAPI}/v1/api/recommendedCauses/create-recommended-couses`, {
+        const response = await fetch(`${baseApi}/v1/api/recommendedCauses/create-recommended-couses`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

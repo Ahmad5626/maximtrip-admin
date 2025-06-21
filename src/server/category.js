@@ -1,5 +1,5 @@
-// const baseAPI = "http://localhost:7000";
-import { baseAPI } from "../utils";
+import { baseApi } from "../utils/constant";
+
 export const createCategory = async (data) => {
     try {
         const response = await fetch(`${baseAPI}/v1/api/create-category`, {
@@ -19,7 +19,7 @@ export const createCategory = async (data) => {
 
 export const deleteCategory = async (id) => {
     try {
-        const response = await fetch(`${baseAPI}/v1/api/delete-category/${id}`, {
+        const response = await fetch(`${baseApi}/v1/api/delete-category/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

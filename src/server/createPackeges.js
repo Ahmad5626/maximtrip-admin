@@ -1,8 +1,8 @@
-import { baseAPI } from "../utils";
+import { baseApi } from "../utils/constant";
 
 export const createPackeges = async (data) => {
     try {
-        const response = await fetch(`${baseAPI}/v1/api/create-packeges`, {
+        const response = await fetch(`${baseApi}/v1/api/create-packeges`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
