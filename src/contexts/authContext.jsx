@@ -9,7 +9,7 @@ import { createPackeges, deletePackeges } from '../server/createPackeges';
 import { createCategory, deleteCategory } from '../server/category';
 import { createBlog, deleteBlog, getBlog } from '../server/Blog';
 import { get } from 'mongoose';
- import { baseUrl } from '@/utils';
+ import { baseUrl } from '../utils';
 import { createPage, deletePage, getPage } from '../server/Page';
 import { createDestinations, deleteDestinations, getDestinations } from '../server/Destinations';
 import { TrendingUpDown } from 'lucide-react';
