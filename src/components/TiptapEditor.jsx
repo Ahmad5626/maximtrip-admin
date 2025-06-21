@@ -16,6 +16,9 @@ import {
   Heading1,
   Heading2,
   Heading3,
+  Heading4,
+  Heading5,
+  Heading6,
   List,
   ListOrdered,
   Quote,
@@ -31,6 +34,7 @@ import {
   Type,
   Eye,
   EyeOff,
+  ChevronDown,
 } from "lucide-react"
 
 const TiptapEditor = ({ content, onChange, placeholder = "Start writing..." }) => {
@@ -38,10 +42,14 @@ const TiptapEditor = ({ content, onChange, placeholder = "Start writing..." }) =
   const [linkUrl, setLinkUrl] = useState("")
   const [linkText, setLinkText] = useState("")
   const [showPreview, setShowPreview] = useState(false)
+  const [showHeadingDropdown, setShowHeadingDropdown] = useState(false)
 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3, 4, 5, 6],
+        },
         bulletList: {
           keepMarks: true,
           keepAttributes: false,
@@ -129,6 +137,23 @@ const TiptapEditor = ({ content, onChange, placeholder = "Start writing..." }) =
     editor.chain().focus().unsetLink().run()
   }, [editor])
 
+  const getCurrentHeadingLevel = () => {
+    if (!editor) return null
+    for (let level = 1; level <= 6; level++) {
+      if (editor.isActive("heading", { level })) {
+        return level
+      }
+    }
+    return null
+  }
+
+  const getCurrentHeadingText = () => {
+    const level = getCurrentHeadingLevel()
+    if (level) return `H${level}`
+    if (editor?.isActive("paragraph")) return "P"
+    return "¶"
+  }
+
   if (!editor) {
     return (
       <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
@@ -150,6 +175,16 @@ const TiptapEditor = ({ content, onChange, placeholder = "Start writing..." }) =
       {children}
     </button>
   )
+
+  const headingOptions = [
+    { level: null, label: "Paragraph", icon: <Type className="w-4 h-4" /> },
+    { level: 1, label: "Heading 1", icon: <Heading1 className="w-4 h-4" /> },
+    { level: 2, label: "Heading 2", icon: <Heading2 className="w-4 h-4" /> },
+    { level: 3, label: "Heading 3", icon: <Heading3 className="w-4 h-4" /> },
+    { level: 4, label: "Heading 4", icon: <Heading4 className="w-4 h-4" /> },
+    { level: 5, label: "Heading 5", icon: <Heading5 className="w-4 h-4" /> },
+    { level: 6, label: "Heading 6", icon: <Heading6 className="w-4 h-4" /> },
+  ]
 
   return (
     <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
@@ -195,36 +230,50 @@ const TiptapEditor = ({ content, onChange, placeholder = "Start writing..." }) =
             </ToolbarButton>
           </div>
 
-          {/* Headings */}
-          <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().setParagraph().run()}
-              isActive={editor.isActive("paragraph")}
-              title="Paragraph"
+          {/* Headings Dropdown */}
+          <div className="relative border-r border-gray-300 pr-2 mr-2">
+            <button
+              type="button"
+              onClick={() => setShowHeadingDropdown(!showHeadingDropdown)}
+              className={`flex items-center gap-1 p-2 rounded transition-colors ${
+                getCurrentHeadingLevel() ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"
+              }`}
+              title="Text Format"
             >
-              <Type className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-              isActive={editor.isActive("heading", { level: 1 })}
-              title="Heading 1"
-            >
-              <Heading1 className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-              isActive={editor.isActive("heading", { level: 2 })}
-              title="Heading 2"
-            >
-              <Heading2 className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-              isActive={editor.isActive("heading", { level: 3 })}
-              title="Heading 3"
-            >
-              <Heading3 className="w-4 h-4" />
-            </ToolbarButton>
+              <span className="text-sm font-medium min-w-[20px]">{getCurrentHeadingText()}</span>
+              <ChevronDown className="w-3 h-3" />
+            </button>
+
+            {showHeadingDropdown && (
+              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[140px]">
+                {headingOptions.map((option) => (
+                  <button
+                    key={option.level || "paragraph"}
+                    type="button"
+                    onClick={() => {
+                      if (option.level) {
+                        editor.chain().focus().toggleHeading({ level: option.level }).run()
+                      } else {
+                        editor.chain().focus().setParagraph().run()
+                      }
+                      setShowHeadingDropdown(false)
+                    }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50 ${
+                      option.level
+                        ? editor.isActive("heading", { level: option.level })
+                          ? "bg-blue-50 text-blue-700"
+                          : ""
+                        : editor.isActive("paragraph")
+                          ? "bg-blue-50 text-blue-700"
+                          : ""
+                    }`}
+                  >
+                    {option.icon}
+                    <span className="text-sm">{option.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Lists and Quotes */}
@@ -399,6 +448,9 @@ const TiptapEditor = ({ content, onChange, placeholder = "Start writing..." }) =
           </div>
         </div>
       )}
+
+      {/* Click outside to close dropdown */}
+      {showHeadingDropdown && <div className="fixed inset-0 z-5" onClick={() => setShowHeadingDropdown(false)} />}
     </div>
   )
 }

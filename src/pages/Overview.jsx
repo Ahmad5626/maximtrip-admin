@@ -52,7 +52,7 @@ useEffect(() => {
                     </div>
                     <div className="drawer-side h-fit ">
                         <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
-                        <ul className="menu py-4 px-2 w-[240px] bg-[#ce3c3d] h-[100dvh] lg:h-[100dvh] text-white text-[15px]">
+                        <ul className="menu py-4 px-2 w-[240px] bg-white h-[100dvh] lg:h-[100dvh] text-gray-500 text-[15px] shadow-2xl">
                             <li>
                                 <img src="/img/maximtrip-logo.png" className="w-48 h-32 object-contain" alt="" />
                             </li>
@@ -63,27 +63,27 @@ useEffect(() => {
                               <i className=" fa-solid fa-user me-1 font-sm text-"></i>All Enquiries</NavLink>
                             </li>
                             <li className="hover:translate-x-2 duration-200 "><NavLink to={'/overview/campaigns'}  className="text-md">
-                                <i className="fa-solid fa-home me-1 font-sm text-gray-100"></i>Packeges </NavLink>
+                                <i className="fa-solid fa-home me-1 font-sm text-"></i>Packeges </NavLink>
                             </li>
                              <li className="hover:translate-x-2 duration-200 "><NavLink to={'/overview/createpackeges'}  className="text-md">
-                                <i className="fa-solid fa-plus me-1 font-sm text-gray-100"></i>Create Packeges</NavLink>
+                                <i className="fa-solid fa-plus me-1 font-sm text-"></i>Create Packeges</NavLink>
                             </li>
                              <li className="hover:translate-x-2 duration-200 "><NavLink to={'/overview/createcategory'}  className="text-md">
-                                <i className="fa-solid fa-plus me-1 font-sm text-gray-100"></i>Category </NavLink>
+                                <i className="fa-solid fa-plus me-1 font-sm text-"></i>Category </NavLink>
                             </li>
 
                             <li className="hover:translate-x-2 duration-200 "><NavLink to={'/overview/destinations'}  className="text-md">
-                                <i className="fa-solid fa-plus me-1 font-sm text-gray-100"></i> Destinations </NavLink>
+                                <i className="fa-solid fa-plus me-1 font-sm text-"></i> Destinations </NavLink>
                             </li>
                              <li className="hover:translate-x-2 duration-200 "><NavLink to={'/overview/Createblogs'}  className="text-md">
-                                <i className="fa-solid fa-plus me-1 font-sm text-gray-100"></i>Blogs </NavLink>
+                                <i className="fa-solid fa-plus me-1 font-sm text-"></i>Blogs </NavLink>
                             </li>
                             <li className="hover:translate-x-2 duration-200 "><NavLink to={'/overview/createpage'}  className="text-md">
-                                <i className="fa-solid fa-plus me-1 font-sm text-gray-100"></i>Add Pages </NavLink>
+                                <i className="fa-solid fa-plus me-1 font-sm text-"></i>Add Pages </NavLink>
                             </li>
                            
                            <li className="hover:translate-x-2 duration-200"><NavLink to={'/'} onClick={handleSideBar2}  className="text-md font-semibold">
-                                <i className="fa-solid fa-right-from-bracket me-1 font-sm text-gray-100"></i>Logout</NavLink>
+                                <i className="fa-solid fa-right-from-bracket me-1 font-sm text-"></i>Logout</NavLink>
                             </li>
                         </ul>
                     </div>

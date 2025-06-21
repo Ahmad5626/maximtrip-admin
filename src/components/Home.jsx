@@ -12,7 +12,7 @@ function Home() {
   // const [role, setRole] = useState(null);
 
   return (
-    <>
+    <div className="">
     <Toaster position="top-center"/>
       <main>
         <Toaster
@@ -122,7 +122,7 @@ function Home() {
           </div>
         </section>
       </main>
-    </>
+    </div>
   );
 }
 

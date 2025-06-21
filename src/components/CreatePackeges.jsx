@@ -370,7 +370,7 @@ console.log(formData);
   return (
    <>
    <Toaster position="top-center" />
-     <div className="bg-white p-6 rounded-lg shadow-sm max-w-6xl mx-auto">
+     <div className=" p-6 rounded-lg shadow-sm max-w-6xl mx-auto">
       <div className="flex items-center justify-between gap-2 border-b pb-3 mb-6">
         <h2 className="text-2xl font-semibold">{initialData ? "Edit Package" : "Create Package"}</h2>
       </div>
