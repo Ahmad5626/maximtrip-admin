@@ -1,5 +1,5 @@
 
-const baseAPI = "http://localhost:7000";
+import { baseAPI } from "../utils";
 export const uploadFile = async (file) => {
   const formData = new FormData();
   formData.append("file", file);

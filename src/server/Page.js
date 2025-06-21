@@ -1,5 +1,5 @@
 
-const baseAPI = "http://localhost:7000";
+import { baseAPI } from "../utils";
 export const createPage = async (formData) => {
     try {
         const data = await fetch(`${baseAPI}/v1/api/create-page`, {

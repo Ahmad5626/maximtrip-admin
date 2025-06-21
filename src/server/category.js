@@ -1,5 +1,5 @@
-const baseAPI = "http://localhost:7000";
-
+// const baseAPI = "http://localhost:7000";
+import { baseAPI } from "../utils";
 export const createCategory = async (data) => {
     try {
         const response = await fetch(`${baseAPI}/v1/api/create-category`, {

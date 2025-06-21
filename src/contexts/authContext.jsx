@@ -9,7 +9,7 @@ import { createPackeges, deletePackeges } from '../server/createPackeges';
 import { createCategory, deleteCategory } from '../server/category';
 import { createBlog, deleteBlog, getBlog } from '../server/Blog';
 import { get } from 'mongoose';
- 
+ import { baseUrl } from '@/utils';
 import { createPage, deletePage, getPage } from '../server/Page';
 import { createDestinations, deleteDestinations, getDestinations } from '../server/Destinations';
 import { TrendingUpDown } from 'lucide-react';
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
     const [createPageFormData, setCreatePageFormData]=useState(initialCreateBlogData)
 
 
- const baseAPI = "http://localhost:7000";
+//  const baseUrl = "http://localhost:7000";
 const deleteUser = async (id) => {
   try {
     const res = await fetch(`http://localhost:7000/v1/api/delete-enquiry/${id}`, {
@@ -92,7 +92,7 @@ const deleteUser = async (id) => {
    
  async function getData(){
          try{
-           const response=await fetch(`${baseAPI}/v1/api/get-enquiry`)
+           const response=await fetch(`${baseUrl}/v1/api/get-enquiry`)
            const data=await response.json()
           
           
@@ -141,7 +141,7 @@ const handleSubmitCreatePackeges=async()=>{
   }
 }
  const getPackegesData=async()=>{
-          const data= await fetch(`${baseAPI}/v1/api/get-packeges`)
+          const data= await fetch(`${baseUrl}/v1/api/get-packeges`)
           if(data){
             const res=await data.json()
             setPackegesData(res.data)
@@ -216,7 +216,7 @@ else{
 }
 
  const getCategoryData=async()=>{
-          const data= await fetch(`${baseAPI}/v1/api/get-category`)
+          const data= await fetch(`${baseUrl}/v1/api/get-category`)
           if(data){
             const res=await data.json()
             setCategoryData(res.data)

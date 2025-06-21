@@ -1,4 +1,4 @@
-const baseAPI= "http://localhost:7000";
+import { baseAPI } from "../utils";
 
 export const createRecommendedCauses = async (data) => {
     try {
