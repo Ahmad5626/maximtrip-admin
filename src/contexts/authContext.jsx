@@ -67,7 +67,17 @@ export const AuthProvider = ({ children }) => {
     const [createDestinationsFormData, setCreateDestinationsFormData]=useState(initialCreateBlogData)
     const [createPageFormData, setCreatePageFormData]=useState(initialCreateBlogData)
 
-
+ async function getData(){
+         try{
+           const response=await fetch(`${baseApi}/v1/api/get-enquiry`)
+           const data=await response.json()
+          
+          
+           setAllUserData(data.data)
+         }catch(err){
+           console.log(err)
+         }
+        }
 
 const deleteUser = async (id) => {
   try {
@@ -82,25 +92,17 @@ const deleteUser = async (id) => {
 
     if (data.success) {
       toast.success(data.message);
-      window.location.reload(); // ✅ reloads page after success
+     getData()
     }
 
   } catch (err) {
     console.log(err); // ✅ catches any fetch errors
+  }finally {
+    getData()
   }
 };
    
- async function getData(){
-         try{
-           const response=await fetch(`${baseApi}/v1/api/get-enquiry`)
-           const data=await response.json()
-          
-          
-           setAllUserData(data.data)
-         }catch(err){
-           console.log(err)
-         }
-        }
+
 
 
 

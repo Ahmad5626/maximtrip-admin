@@ -1,1 +1,1 @@
-export const baseApi = "https://api.maximtrip.com"
+export const baseApi = "api.maximtrip.com"

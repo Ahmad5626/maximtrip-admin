@@ -90,7 +90,7 @@ const CreatePackeges = () => {
                         </div>
                         
                         <div className='mt-4'>
-                        <button type="submit" className='px-8 py-3 bg-gradient-to-r from-amber-500 to-yellow-400 text-white font-medium rounded-full hover:shadow-lg transition-all duration-300 hover:from-amber-600 hover:to-yellow-500  text-white p-2 px-5 rounded-lg font-semibold text-sm' >
+                        <button type="submit" className='px-8 py-3 bg-[#ce3c3d] text-white font-medium rounded-full hover:shadow-lg transition-all duration-300 hover:from-amber-600 hover:to-yellow-500  text-white p-2 px-5 rounded-lg font-semibold text-sm' >
                             Create 
                         </button>
                     </div>
