@@ -56,16 +56,25 @@ console.log(emailValue);
                 <div className="w-[320px] min-h-96 px-8 py-6 text-left bg-[#ffffff] border bg-opacity-100 backdrop-blur-lg rounded-xl shadow-2xl">
                     <form onSubmit={handleloginDashboard}>
                         <div className="flex flex-col h-full select-none">
+                        <h1 className="text-2xl font-bold mb-4 text-center"> Admin Login</h1>
                             <div className="mb-2 flex justify-center">
-                                <img src="/img/maximtrip-logo.png" className="w-[200px]" style={{ fllter: "brightness(10)" }} />
+                                <img src="/img/maximtrip-logo.png" className="w-[250px]" style={{ fllter: "brightness(10)" }} />
+                            </div>
+
+                             <div className="w-full flex flex-col gap-2">
+                               
+                                <select className="border rounded-lg px-3 py-2 mb-5 text-black text-sm w-full outline-none border-gray-300  bg-opacity-100 placeholder:text-gray-600" >
+                                    <option value="Admin">Admin</option>
+                                    <option value="Staff">Staff</option>
+                                </select>
                             </div>
                             <div className="w-full flex flex-col gap-2">
-                                <label className="font-semibold text-xs text-white tracking-wide">Email</label>
+                                
                                 <input className="border rounded-lg px-3 py-2 mb-5 text-black text-sm w-full outline-none border-gray-300  bg-opacity-100 placeholder:text-gray-600" placeholder="example@mail.com" type="email" name="email" value={emailValue.email} onChange={handleChange} />
                             </div>
                         </div>
                         <div className="w-full flex flex-col gap-2">
-                            <label className="font-semibold text-xs text-white tracking-wide">Password</label>
+                            {/* <label className="font-semibold text-xs text-white tracking-wide">Password</label> */}
                             <div className="flex justify-between items-center border rounded-lg px-3 py-2 mb-5 text-black text-sm w-full  border-gray-300  bg-opacity-100 placeholder:text-gray-600">
                                 <input type={showPassword ? "text" : "password"} value={emailValue.password} onChange={handleChange} className="bg-transparent text-black text-sm w-full outline-none placeholder:text-gray-400" placeholder="••••••••" name="password" />
                                 <button type="button" className="text-black text-sm" onClick={() => setShowPassword(!showPassword)}>
