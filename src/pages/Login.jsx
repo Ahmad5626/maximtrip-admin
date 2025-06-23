@@ -24,10 +24,7 @@ function Login() {
 
 
 
-    useEffect(() => {
-        document.title = "Login | GiveUmmah"
-      })
-
+  
     const navigate = useNavigate()
 
    

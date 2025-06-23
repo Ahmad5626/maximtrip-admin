@@ -11,12 +11,12 @@ function Subscribe() {
                         <div className="flex mb-8 lg:mb-0">
                             <div className="flex flex-grow flex-col p-6 space-y-6 rounded shadow sm:p-8 bg-gray-100 border border-gray-300">
                                 <div className="space-y-2">
-                                    <h4 className="text-2xl font-bold">Beginner</h4>
+                                    <h4 className="text-2xl font-bold"></h4>
                                     <span className="text-6xl font-bold">₹199
-                                        <span className="text-sm tracking-wide">/month</span>
+                                        <span className="text-sm tracking-wide">/</span>
                                     </span>
                                 </div>
-                                <p className="mt-3 leading-relaxed text-gray-600">Etiam ac convallis enim, eget euismod dolor.</p>
+                                <p className="mt-3 leading-relaxed text-gray-600">Etiam ac , eget euismod dolor.</p>
                                 <ul className="flex-1 mb-6 text-gray-500">
                                     <li className="flex items-center mb-2 space-x-2">
                                         <i className="fa-solid fa-circle-check text-blueClr"></i>
@@ -28,7 +28,7 @@ function Subscribe() {
                                     </li>
                                     <li className="flex items-center mb-2 space-x-2">
                                         <i className="fa-solid fa-circle-xmark"></i>
-                                        <span className="line-through">24/7 Support</span>
+                                        <span className="line-through">24/7 </span>
                                     </li>
                                 </ul>
                                 <button type="button" className="inline-block px-5 py-3 font-semibold tracking-wider text-center rounded bg-blueClr text-white">SUBSCRIBE</button>
@@ -39,7 +39,7 @@ function Subscribe() {
                                 <div className="space-y-2">
                                     <h4 className="text-2xl font-bold">Pro</h4>
                                     <span className="text-6xl font-bold">₹499
-                                        <span className="text-sm tracking-wide">3months</span>
+                                        <span className="text-sm tracking-wide"></span>
                                     </span>
                                 </div>
                                 <p className="leading-relaxed">Morbi cursus ut sapien sit amet consectetur.</p>
@@ -50,7 +50,7 @@ function Subscribe() {
                                     </li>
                                     <li className="flex items-center mb-2 space-x-2">
                                         <i className="fa-solid fa-circle-check text-white"></i>
-                                        <span>Search for Defaulters</span>
+                                        <span>Search for </span>
                                     </li>
                                     <li className="flex items-center mb-2 space-x-2">
                                         <i className="fa-solid fa-circle-xmark text-white"></i>
@@ -63,12 +63,12 @@ function Subscribe() {
                         <div className="flex mb-8 lg:mb-0">
                             <div className="flex flex-grow flex-col p-6 space-y-6 rounded shadow sm:p-8 bg-gray-100 border border-gray-300">
                                 <div className="space-y-2">
-                                    <h4 className="text-2xl font-bold">Advance</h4>
+                                    <h4 className="text-2xl font-bold"></h4>
                                     <span className="text-6xl font-bold">₹999
                                         <span className="text-sm tracking-wide">12months</span>
                                     </span>
                                 </div>
-                                <p className="leading-relaxed text-gray-600">Phasellus ultrices bibendum nibh in vehicula.</p>
+                                <p className="leading-relaxed text-gray-600">Phaselh in vehicula.</p>
                                 <ul className="space-y-2 text-gray-500">
                                     <li className="flex items-center mb-2 space-x-2">
                                         <i className="fa-solid fa-circle-check text-blueClr"></i>
@@ -76,7 +76,7 @@ function Subscribe() {
                                     </li>
                                     <li className="flex items-center mb-2 space-x-2">
                                         <i className="fa-solid fa-circle-check text-blueClr"></i>
-                                        <span>Search for Defaulters</span>
+                                        <span>Search for </span>
                                     </li>
                                     <li className="flex items-center mb-2 space-x-2">
                                         <i className="fa-solid fa-circle-check text-blueClr"></i>
@@ -87,7 +87,7 @@ function Subscribe() {
                                         <span>Super saving plan</span>
                                     </li>
                                 </ul>
-                                <a rel="noopener noreferrer" href="#" className="inline-block w-full px-5 py-3 font-semibold tracking-wider text-center rounded bg-blueClr text-white">SUBSCRIBE</a>
+                                <a rel=" noreferrer" href="#" className="inline-block w-full px-5 py-3 font-semibold tracking-wider text-center rounded bg-blueClr text-white">SUBSCRIBE</a>
                             </div>
                         </div>
                     </div>

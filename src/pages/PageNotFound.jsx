@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 
 function PageNotFound() {
     useEffect(() => {
-        document.title = "Page Not Found | Vyapar Score"
+        document.title = "Page Not Found "
     })
 
     return (

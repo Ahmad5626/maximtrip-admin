@@ -9,17 +9,8 @@ import PageNotFound from "./pages/PageNotFound";
 import Profile from "./components/Profile";
 import Home from "./components/Home";
 
-import MoneyBlockerFinder from "./components/MoneyBlockerFinder";
 import CreatePackeges from "./components/CreatePackeges";
 
-
-
-import PastClass from "./components/PastClass";
-
-
-import Upcommingclass from "./components/Upcommingclass";
-import Request from "./components/Request";
-import Shedule from "./components/Shedule";
 import Campaigns from "./components/Campaigns";
 import EditButtons from "./components/EditButtons";
 import RecommendedCauses from "./components/CreateCategory";
