@@ -18,7 +18,7 @@ export const createPage = async (formData) => {
 
 export const getPage = async () => {
     try {
-        const data = await fetch(`${baseAPI}/v1/api/get-page`);
+        const data = await fetch(`${baseApi}/v1/api/get-page`);
         const res = await data.json();
         return res;
     } catch (error) {
@@ -27,7 +27,7 @@ export const getPage = async () => {
 }
 export const deletePage = async (id) => {
     try {
-        const data = await fetch(`${baseAPI}/v1/api/delete-page/${id}`, {
+        const data = await fetch(`${baseApi}/v1/api/delete-page/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

@@ -2,7 +2,7 @@ import { baseApi } from "../utils/constant";
 
 export const createCategory = async (data) => {
     try {
-        const response = await fetch(`${baseAPI}/v1/api/create-category`, {
+        const response = await fetch(`${baseApi}/v1/api/create-category`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

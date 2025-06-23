@@ -18,7 +18,7 @@ export const createBlog = async (formData) => {
 
 export const getBlog = async () => {
     try {
-        const data = await fetch(`${baseAPI}/v1/api/get-blog`);
+        const data = await fetch(`${baseApi}/v1/api/get-blog`);
         const res = await data.json();
         return res;
     } catch (error) {
@@ -27,7 +27,7 @@ export const getBlog = async () => {
 }
 export const deleteBlog = async (id) => {
     try {
-        const data = await fetch(`${baseAPI}/v1/api/delete-blog/${id}`, {
+        const data = await fetch(`${baseApi}/v1/api/delete-blog/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

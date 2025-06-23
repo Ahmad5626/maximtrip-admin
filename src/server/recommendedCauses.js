@@ -20,7 +20,7 @@ export const createRecommendedCauses = async (data) => {
 
 export const getAllRecommendedCauses=async()=>{
  try {
-    const res=await fetch(`${baseAPI}/v1/api/recommendedCauses/get-recommended-couses`,{
+    const res=await fetch(`${baseApi}/v1/api/recommendedCauses/get-recommended-couses`,{
      method:"GET",
      headers:{
        "Content-Type": "application/json",

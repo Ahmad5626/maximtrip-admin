@@ -128,18 +128,6 @@ const handleChangeCraetePackeges=async(e)=>{
   }
 }
  
-const handleSubmitCreatePackeges=async()=>{
- 
-  const data =await createPackeges(formData)
-  if(data.success){
-    toast.success("Packeges Created successfully");
-  }
-  else{
-    toast.error("Packeges update failed");
-    console.log(data);
-    
-  }
-}
  const getPackegesData=async()=>{
           const data= await fetch(`${baseApi}/v1/api/get-packeges`)
           if(data){
@@ -148,18 +136,44 @@ const handleSubmitCreatePackeges=async()=>{
             
           }
         }
+const handleSubmitCreatePackeges=async()=>{
+ 
+  const data =await createPackeges(formData)
+ try {
+   if(data.success){
+    toast.success("Packeges Created successfully");
+    getPackegesData()
+  }
+  else{
+    toast.error("Packeges update failed");
+    console.log(data);
+    
+  }
+ } catch (error) {
+  
+ }finally{
+  getPackegesData()
+ }
+}
+
 
   const handleDeletePackeges=async(id)=>{
           const data=await deletePackeges(id)
-          if(data.success){
+        try {
+            if(data.success){
             toast.success("Packeges deleted successfully");
+            getPackegesData()
           }
           else{
             toast.error("Packeges deletion failed");
             console.log(data);
             
           }
-         }
+        } catch (error) {
+          
+        }finally{
+          getPackegesData()
+         }}
         
 
 // create Cateory
@@ -188,33 +202,6 @@ const handleChangeCraeteCategory=async(e)=>{
  }
 }
  
-const handleSubmitCreateCategory=async(e)=>{
-  e.preventDefault();
-  const data =await createCategory(createCategoryFormData)
-  if(data.success){
-
-    
-    toast.success("Category Created successfully");
-  }
-  else{
-    toast.error("Category update failed");
-    console.log(data);
-    
-  }
-}
-
-const handleDeletecategory=async(id)=>{
- const data=await deleteCategory(id)
- if(data.success){
-  toast.success("Category deleted successfully");
-}
-else{
-  toast.error("Category deletion failed");
-  console.log(data);
-  
-}
-}
-
  const getCategoryData=async()=>{
           const data= await fetch(`${baseApi}/v1/api/get-category`)
           if(data){
@@ -223,6 +210,46 @@ else{
             
           }
         }
+const handleSubmitCreateCategory=async(e)=>{
+  e.preventDefault();
+  const data =await createCategory(createCategoryFormData)
+  try {
+    if(data.success){
+ toast.success("Category Created successfully");
+ getCategoryData()
+  }
+  else{
+    toast.error("Category update failed");
+    console.log(data);
+    
+  }
+  } catch (error) {
+    
+  }finally{
+    getCategoryData()
+  }
+}
+
+const handleDeletecategory=async(id)=>{
+ const data=await deleteCategory(id)
+try {
+   if(data.success){
+  toast.success("Category deleted successfully");
+  getCategoryData()
+}
+else{
+  toast.error("Category deletion failed");
+  console.log(data);
+  
+}
+} catch (error) {
+  
+}finally{
+  getCategoryData()
+}
+}
+
+
 
 // create blog
 
@@ -248,20 +275,7 @@ const handleChangeCreateBlog=async(e)=>{
   setUploadingHero(false)
  }
 }
-         
-const handleSubmitCreateBlog=async(e)=>{
-  e.preventDefault();
-  const data =await createBlog(createBlogFormData)
-  if(data.success){
-    toast.success("Blog Created successfully");
-  }
-  else{
-    toast.error("Blog update failed");
-    console.log(data);
-    
-  }
-}
-
+   
 const getBlogData=async()=>{
   const data= await getBlog()
   if(data){
@@ -270,17 +284,45 @@ const getBlogData=async()=>{
     
   }
 }
+const handleSubmitCreateBlog=async(e)=>{
+  e.preventDefault();
+  const data =await createBlog(createBlogFormData)
+try {
+    if(data.success){
+    toast.success("Blog Created successfully");
+    getBlogData()
+  }
+  else{
+    toast.error("Blog update failed");
+    console.log(data);
+    
+  }
+} catch (error) {
+  
+}finally{
+  getBlogData()
+}
+}
+
+
    
 const handleDeleteBlog=async(id)=>{
   const data=await deleteBlog(id)
-  if(data.success){
+ try {
+   if(data.success){
     toast.success("Blog deleted successfully");
+    getBlogData()
   }
   else{
     toast.error("Blog deletion failed");
     console.log(data);
     
   }
+ } catch (error) {
+  
+ }finally{
+  getBlogData()
+ }
 }
 
 
@@ -308,39 +350,53 @@ try {
   setUploadingHero(false)
 }
 }
-         
-const handleSubmitCreateDestinations=async(e)=>{
-  e.preventDefault();
-  const data =await createDestinations(createDestinationsFormData)
-  if(data.success){
-    toast.success("destinations Created successfully");
-  }
-  else{
-    toast.error("destinations update failed");
-    console.log(data);
-    
-  }
-}
-
-const getDestinationsData=async()=>{
+  const getDestinationsData=async()=>{
   const data= await getDestinations()
   if(data){
     
     setDestinationsData(data.data)
     
   }
+}       
+const handleSubmitCreateDestinations=async(e)=>{
+  e.preventDefault();
+  const data =await createDestinations(createDestinationsFormData)
+ try {
+   if(data.success){
+    toast.success("destinations Created successfully");
+    getDestinationsData()
+  }
+  else{
+    toast.error("destinations update failed");
+    console.log(data);
+    
+  }
+ } catch (error) {
+  
+ }finally{
+  getDestinationsData()
+ }
 }
+
+
    
 const handleDeleteDestinations=async(id)=>{
   const data=await deleteDestinations(id)
-  if(data.success){
+try {
+    if(data.success){
     toast.success("destinations deleted successfully");
+    getDestinationsData()
   }
   else{
     toast.error("destinations deletion failed");
     console.log(data);
     
   }
+} catch (error) {
+  
+}finally{
+  getDestinationsData()
+}
 }
 
 // create Page
@@ -367,20 +423,7 @@ const handleChangeCreatePage=async(e)=>{
     setUploadingHero(false)
   }
 }
-         
-const handleSubmitCreatePage=async(e)=>{
-  e.preventDefault();
-  const data =await createPage(createPageFormData)
-  if(data.success){
-    toast.success("Page Created successfully");
-  }
-  else{
-    toast.error("Page update failed");
-    console.log(data);
     
-  }
-}
-
 const getPageData=async()=>{
   const data= await getPage()
   if(data){
@@ -389,17 +432,45 @@ const getPageData=async()=>{
     
   }
 }
+const handleSubmitCreatePage=async(e)=>{
+  e.preventDefault();
+  const data =await createPage(createPageFormData)
+try {
+    if(data.success){
+    toast.success("Page Created successfully");
+    getPageData()
+  }
+  else{
+    toast.error("Page update failed");
+    console.log(data);
+    
+  }
+} catch (error) {
+  
+}finally{
+  getPageData()
+}
+}
+
+
    
 const handleDeletePage=async(id)=>{
   const data=await deletePage(id)
-  if(data.success){
+ try {
+   if(data.success){
     toast.success("Page deleted successfully");
+    getPageData()
   }
   else{
     toast.error("Page deletion failed");
     console.log(data);
     
   }
+ } catch (error) {
+  
+ }finally{
+  getPageData()
+ }
 }
 
 
@@ -415,7 +486,7 @@ const handleDeletePage=async(id)=>{
         },[])
 
 
-console.log(blogData);
+
 
 
 

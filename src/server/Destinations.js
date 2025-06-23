@@ -27,7 +27,7 @@ export const getDestinations = async () => {
 }
 export const deleteDestinations = async (id) => {
     try {
-        const data = await fetch(`${baseAPI}/v1/api/delete-Destination/${id}`, {
+        const data = await fetch(`${baseApi}/v1/api/delete-Destination/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
