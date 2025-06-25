@@ -11,17 +11,15 @@ import {
   Edit,
   Trash,
   X,
-  Save,
   Eye,
   ImageIcon,
-  Plus,
-  Minus,
-  Camera,
   Upload,
 } from "lucide-react"
 import { useAuth } from "../contexts/authContext"
 import { toast, Toaster } from "sonner"
 import { uploadFile } from "../server/uploadImg"
+import TiptapEditor from "./TiptapEditor"
+import { baseApi } from "../utils/constant"
 
 function App() {
   // Get real data from your backend via useAuth hook
@@ -45,8 +43,7 @@ function App() {
   const [loading, setLoading] = useState(true)
 
   // File input refs
-  const heroImageInputRef = useRef(null)
-  const galleryImageInputRef = useRef(null)
+  const featureImageInputRef = useRef(null)
 
   // Define visible columns based on ALL your form fields
   const [visibleColumns, setVisibleColumns] = useState({
@@ -54,7 +51,7 @@ function App() {
     days: true,
     address: true,
     overview: true,
-    heroImage: true,
+    featureImage: true,
     multipleImages: true,
     price: true,
     originalPrice: true,
@@ -100,11 +97,11 @@ function App() {
       filtered = filtered.filter((item) => {
         const searchFields = [
           item.headline,
-          item.address,
+          item.location,
           item.overview,
-          item.category,
+          item.packageCategory,
           item.days,
-          item.price?.toString(),
+          item.bestPrice?.toString(),
         ]
 
         return searchFields.some((field) => field?.toString().toLowerCase().includes(searchTerm.toLowerCase()))
@@ -260,17 +257,15 @@ function App() {
   }
 
   // Handle delete item - Fixed API endpoint
-  const handleDeleteItem = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this package?")) {
-      return
+  const handleDelete = async (item) => {
+    if (!window.confirm("Are you sure you want to delete this package? This action cannot be undone.")) {
+      return // If the user cancels the deletion, exit the function
     }
 
     try {
-      const response = await fetch(`http://localhost:7000/v1/api/delete-packeges/${id}`, {
+      const packageId = item._id || item.id
+      const response = await fetch(`${baseApi}/v1/api/delete-packeges/${packageId}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
       })
 
       if (!response.ok) {
@@ -280,34 +275,27 @@ function App() {
       const result = await response.json()
 
       if (!result.success) {
-        throw new Error(result.message || "Delete failed")
+        throw new Error(result.message || "Deletion failed")
       }
-
-      toast.success("Package deleted successfully")
 
       // Update local state
-      const newData = data.filter((item) => (item._id || item.id) !== id)
+      const newData = data.filter((i) => (i._id || i.id) !== packageId)
       setData(newData)
 
-      setActionMenuOpen(null)
-
-      // Refresh data from backend
-      if (fetchPackegesData) {
-        fetchPackegesData()
-      }
+      toast.success("Package deleted successfully!")
     } catch (error) {
-      toast.error(`Failed to delete package: ${error.message}`)
       console.error("Error deleting package:", error)
+      toast.error(`Failed to delete package: ${error.message}`)
     }
   }
 
-  // Handle input change in edit modal
-  const handleInputChange = (field, value) => {
+  // Fixed handleInputChange function
+  const handleInputChange = (name, value) => {
     setEditedItem((prev) => {
       if (!prev) return null
       return {
         ...prev,
-        [field]: value,
+        [name]: value,
       }
     })
   }
@@ -328,7 +316,7 @@ function App() {
       return
     }
 
-    const uploadKey = type === "hero" ? "hero" : `gallery-${index || Date.now()}`
+    const uploadKey = type === "featureImage" ? "featureImage" : `gallery-${index || Date.now()}`
     setUploadingImages((prev) => ({ ...prev, [uploadKey]: true }))
 
     try {
@@ -336,8 +324,8 @@ function App() {
       const cloudinaryUrl = await uploadFile(file)
 
       if (cloudinaryUrl) {
-        if (type === "hero") {
-          handleInputChange("heroImage", cloudinaryUrl)
+        if (type === "featureImage") {
+          handleInputChange("featureImage", cloudinaryUrl)
         } else if (type === "gallery") {
           const currentImages = editedItem?.multipleImages || []
           if (index !== null) {
@@ -365,8 +353,8 @@ function App() {
   const handleImageEdit = (field, value, index) => {
     if (!editedItem) return
 
-    if (field === "heroImage") {
-      handleInputChange("heroImage", value)
+    if (field === "featureImage") {
+      handleInputChange("featureImage", value)
     } else if (field === "multipleImages") {
       const newImages = [...(editedItem.multipleImages || [])]
       if (index !== undefined) {
@@ -393,8 +381,8 @@ function App() {
       toast.error("Package headline is required")
       return
     }
-    if (!editedItem.price || Number(editedItem.price) <= 0) {
-      toast.error("Valid price is required")
+    if (!editedItem.bestPrice || Number(editedItem.bestPrice) <= 0) {
+      toast.error("Valid bestPrice is required")
       return
     }
 
@@ -405,13 +393,28 @@ function App() {
       const updateData = {
         headline: editedItem.headline,
         days: editedItem.days,
-        address: editedItem.address,
+        location: editedItem.location, // Fixed: was mapping to 'address'
         overview: editedItem.overview,
-        heroImage: editedItem.heroImage,
-        multipleImages: editedItem.multipleImages || [],
-        price: Number(editedItem.price),
-        originalPrice: editedItem.originalPrice ? Number(editedItem.originalPrice) : undefined,
-        category: editedItem.category,
+        featureImage: editedItem.featureImage,
+        bestPrice: Number(editedItem.bestPrice),
+        maxPrice: editedItem.maxPrice ? Number(editedItem.maxPrice) : undefined,
+        slug: editedItem.slug, // Added slug
+        rating: editedItem.rating, // Added rating
+        cityRoute: editedItem.cityRoute, // Added cityRoute
+        featured: editedItem.featured, // Added featured
+
+        packageCategory: editedItem.packageCategory,
+        highlights: editedItem.highlights, // Added highlights
+        meals: editedItem.meals, // Added meals
+        transfer: editedItem.transfer, // Added transfer
+        hotel: editedItem.hotel, // Added hotel
+        sightseeing: editedItem.sightseeing, // Added sightseeing
+        shortDescription: editedItem.shortDescription, // Added shortDescription
+        longDescription: editedItem.longDescription, // Added longDescription
+        cancellationPolicies: editedItem.cancellationPolicies, // Added cancellationPolicies
+        extraTitle: editedItem.extraTitle, // Added extraTitle
+        metaDescription: editedItem.metaDescription, // Added metaDescription
+        metaKeywords: editedItem.metaKeywords, // Added metaKeywords
         itinerary: editedItem.itinerary || [],
         inclusions: editedItem.inclusions?.filter((item) => item.trim() !== "") || [],
         exclusions: editedItem.exclusions?.filter((item) => item.trim() !== "") || [],
@@ -420,7 +423,7 @@ function App() {
 
       console.log("Updating package with data:", updateData)
 
-      const response = await fetch(`http://localhost:7000/v1/api/update-packeges/${packageId}`, {
+      const response = await fetch(`${baseApi}/v1/api/update-packeges/${packageId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -465,13 +468,6 @@ function App() {
       console.error("Error updating package:", error)
       toast.error(`Failed to update package: ${error.message}`)
     }
-  }
-
-  // Utility functions
-  const truncateText = (text, maxLength = 50) => {
-    if (!text) return ""
-    if (text.length <= maxLength) return text
-    return text.substring(0, maxLength) + "..."
   }
 
   // Show loading state if data is still loading
@@ -639,17 +635,17 @@ function App() {
                   )}
 
                   {visibleColumns.address && (
-                    <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[150px]">Destination</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[150px]">location</th>
                   )}
 
                   {visibleColumns.category && (
                     <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[120px]">Category</th>
                   )}
 
-                  {visibleColumns.price && (
+                  {visibleColumns.bestPrice && (
                     <th
                       className="px-6 py-4 text-left font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors min-w-[120px]"
-                      onClick={() => requestSort("price")}
+                      onClick={() => requestSort("bestPrice")}
                     >
                       <div className="flex items-center">
                         Price
@@ -666,20 +662,10 @@ function App() {
                     </th>
                   )}
 
-                  {visibleColumns.heroImage && (
-                    <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[120px]">Hero Image</th>
-                  )}
-
-                  {visibleColumns.multipleImages && (
-                    <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[120px]">Gallery</th>
-                  )}
-
-                  {visibleColumns.overview && (
-                    <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[200px]">Overview</th>
-                  )}
-
-                  {visibleColumns.originalPrice && (
-                    <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[120px]">Original Price</th>
+                  {visibleColumns.featureImage && (
+                    <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[120px]">
+                      featureImage Image
+                    </th>
                   )}
 
                   {visibleColumns.itinerary && (
@@ -698,10 +684,6 @@ function App() {
                     <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[150px]">
                       Terms & Conditions
                     </th>
-                  )}
-
-                  {visibleColumns.createdAt && (
-                    <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[120px]">Created</th>
                   )}
 
                   <th className="px-6 py-4 text-right font-semibold text-gray-900 w-20">Actions</th>
@@ -736,8 +718,8 @@ function App() {
 
                       {visibleColumns.address && (
                         <td className="px-6 py-4 text-sm text-gray-600">
-                          <div className="max-w-[150px] truncate" title={item.address}>
-                            {item.address}
+                          <div className="max-w-[150px] truncate" title={item.location}>
+                            {item.location}
                           </div>
                         </td>
                       )}
@@ -745,24 +727,24 @@ function App() {
                       {visibleColumns.category && (
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            {item.category}
+                            {item.packageCategory}
                           </span>
                         </td>
                       )}
 
-                      {visibleColumns.price && (
+                      {visibleColumns.bestPrice && (
                         <td className="px-6 py-4">
-                          <div className="font-bold text-green-600 text-sm">{formatPrice(item.price)}</div>
+                          <div className="font-bold text-green-600 text-sm">{formatPrice(item.bestPrice)}</div>
                         </td>
                       )}
 
-                      {visibleColumns.heroImage && (
+                      {visibleColumns.featureImage && (
                         <td className="px-6 py-4">
-                          {item.heroImage ? (
+                          {item.featureImage ? (
                             <div className="relative group">
                               <img
-                                src={item.heroImage || "/placeholder.svg?height=60&width=60"}
-                                alt="Hero"
+                                src={item.featureImage || "/placeholder.svg?height=60&width=60"}
+                                alt="featureImage"
                                 className="w-16 h-16 object-cover rounded-lg border border-gray-200 shadow-sm"
                                 onError={(e) => {
                                   e.target.src = "/placeholder.svg?height=60&width=60"
@@ -776,56 +758,6 @@ function App() {
                             <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
                               <ImageIcon className="h-6 w-6 text-gray-400" />
                             </div>
-                          )}
-                        </td>
-                      )}
-
-                      {visibleColumns.multipleImages && (
-                        <td className="px-6 py-4">
-                          <div className="flex -space-x-2">
-                            {item.multipleImages?.slice(0, 3).map((image, imgIndex) => (
-                              <img
-                                key={imgIndex}
-                                src={image || "/placeholder.svg?height=40&width=40"}
-                                alt={`Gallery ${imgIndex + 1}`}
-                                className="w-10 h-10 object-cover rounded-full border-2 border-white shadow-sm"
-                                onError={(e) => {
-                                  e.target.src = "/placeholder.svg?height=40&width=40"
-                                }}
-                              />
-                            ))}
-                            {item.multipleImages && item.multipleImages.length > 3 && (
-                              <div className="w-10 h-10 bg-gray-100 rounded-full border-2 border-white shadow-sm flex items-center justify-center">
-                                <span className="text-xs font-medium text-gray-600">
-                                  +{item.multipleImages.length - 3}
-                                </span>
-                              </div>
-                            )}
-                            {(!item.multipleImages || item.multipleImages.length === 0) && (
-                              <div className="w-10 h-10 bg-gray-100 rounded-full border-2 border-white shadow-sm flex items-center justify-center">
-                                <ImageIcon className="h-4 w-4 text-gray-400" />
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                      )}
-
-                      {visibleColumns.overview && (
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          <div className="max-w-[200px] truncate" title={item.overview}>
-                            {truncateText(item.overview, 60)}
-                          </div>
-                        </td>
-                      )}
-
-                      {visibleColumns.originalPrice && (
-                        <td className="px-6 py-4">
-                          {item.originalPrice ? (
-                            <div className="font-medium text-gray-600 text-sm line-through">
-                              {formatPrice(item.originalPrice)}
-                            </div>
-                          ) : (
-                            <span className="text-gray-400 text-sm">-</span>
                           )}
                         </td>
                       )}
@@ -898,10 +830,6 @@ function App() {
                         </td>
                       )}
 
-                      {visibleColumns.createdAt && (
-                        <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
-                      )}
-
                       <td className="px-6 py-4 text-right relative">
                         <button
                           className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -925,7 +853,7 @@ function App() {
                             </button>
                             <button
                               className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                              onClick={() => handleDeleteItem(item._id || item.id || "")}
+                              onClick={() => handleDelete(item)}
                             >
                               <Trash className="h-4 w-4 mr-3" />
                               Delete Package
@@ -1034,549 +962,375 @@ function App() {
           )}
         </div>
 
-        {/* Enhanced Edit Modal with Cloudinary Image Upload - Keep existing modal code */}
-        {showEditModal && editedItem && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl">
-              {/* Modal Header */}
-              <div className="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        {/* Edit Modal */}
+        {showEditModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full left-20">
+            <div className="relative top-20 mx-auto p-5 border w-[70%] shadow-lg rounded-md bg-white">
+              <h3 className="text-lg font-medium leading-6 text-gray-900">Edit Package</h3>
+              <div className="mt-2">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">Edit Package</h3>
-                  <p className="text-sm text-gray-600 mt-1">Update package information and images</p>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Headline</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.headline || ""}
+                    onChange={(e) => handleInputChange("headline", e.target.value)}
+                    placeholder="Enter package headline"
+                    required
+                  />
                 </div>
-                <button
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-white rounded-full transition-colors"
-                  onClick={() => {
-                    setShowEditModal(false)
-                    setEditedItem(null)
-                    setSelectedItem(null)
-                    setImageEditMode({})
-                  }}
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Days</label>
+                  <input
+                    type="number"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.days || ""}
+                    onChange={(e) => handleInputChange("days", e.target.value)}
+                    placeholder="Enter days"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Package Category</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.packageCategory || ""}
+                    onChange={(e) => handleInputChange("packageCategory", e.target.value)}
+                    placeholder="Enter package category"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.location || ""}
+                    onChange={(e) => handleInputChange("location", e.target.value)}
+                    placeholder="Enter location"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Best Price</label>
+                  <input
+                    type="number"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.bestPrice || ""}
+                    onChange={(e) => handleInputChange("bestPrice", e.target.value)}
+                    placeholder="Enter best price"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
+                  <input
+                    type="number"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.maxPrice || ""}
+                    onChange={(e) => handleInputChange("maxPrice", e.target.value)}
+                    placeholder="Enter max price"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Slug</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.slug || ""}
+                    onChange={(e) => handleInputChange("slug", e.target.value)}
+                    placeholder="Enter Slug"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.rating || ""}
+                    onChange={(e) => handleInputChange("rating", e.target.value)}
+                    placeholder="Enter rating"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">City Route</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.cityRoute || ""}
+                    onChange={(e) => handleInputChange("cityRoute", e.target.value)}
+                    placeholder="Enter city route"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Featured</label>
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.featured || false}
+                    onChange={(e) => handleInputChange("featured", e.target.value === "true")}
+                  >
+                    <option value={true}>True</option>
+                    <option value={false}>False</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Overview</label>
+                  <TiptapEditor
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={4}
+                    value={editedItem?.overview || ""}
+                    onChange={(content) => handleInputChange("overview", content)}
+                    placeholder="Enter package overview"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Highlights</label>
+                  <TiptapEditor
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={4}
+                    value={editedItem?.highlights || ""}
+                    onChange={(content) => handleInputChange("highlights", content)}
+                    placeholder="Enter package highlights"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Meals</label>
+                  <TiptapEditor
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={4}
+                    value={editedItem?.meals || ""}
+                    onChange={(content) => handleInputChange("meals", content)}
+                    placeholder="Enter package meals"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Transfer</label>
+                  <TiptapEditor
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={4}
+                    value={editedItem?.transfer || ""}
+                    onChange={(content) => handleInputChange("transfer", content)}
+                    placeholder="Enter package transfer"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Hotel</label>
+                  <TiptapEditor
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={4}
+                    value={editedItem?.hotel || ""}
+                    onChange={(content) => handleInputChange("hotel", content)}
+                    placeholder="Enter package hotel"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Sightseeing</label>
+                  <TiptapEditor
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={4}
+                    value={editedItem?.sightseeing || ""}
+                    onChange={(content) => handleInputChange("sightseeing", content)}
+                    placeholder="Enter package sightseeing"
+                  />
+                </div>
 
-              {/* Modal Content */}
-              <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Basic Information */}
-                  <div className="space-y-6">
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <Edit className="h-5 w-5 mr-2 text-blue-600" />
-                        Basic Information
-                      </h4>
-
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Package Title <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            value={editedItem.headline || ""}
-                            onChange={(e) => handleInputChange("headline", e.target.value)}
-                            placeholder="Enter package title"
-                            required
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Duration</label>
-                            <input
-                              type="text"
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              value={editedItem.days || ""}
-                              onChange={(e) => handleInputChange("days", e.target.value)}
-                              placeholder="e.g., 4 days / 3 nights"
-                            />
+                {/* Feature Image */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Feature Image</label>
+                  <div className="space-y-3">
+                    {editedItem?.featureImage && (
+                      <div className="relative group">
+                        <img
+                          src={editedItem.featureImage || "/placeholder.svg?height=200&width=300"}
+                          alt="feature"
+                          className="w-full h-40 object-cover rounded-lg border border-gray-200"
+                          onError={(e) => {
+                            e.target.src = "/placeholder.svg?height=200&width=300"
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center">
+                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => featureImageInputRef.current?.click()}
+                              className="bg-white text-gray-700 px-3 py-2 rounded-md text-sm shadow-lg hover:bg-gray-50"
+                              disabled={uploadingImages.featureImage}
+                            >
+                              {uploadingImages.featureImage ? "Uploading..." : "Change"}
+                            </button>
                           </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                            <input
-                              type="text"
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              value={editedItem.category || ""}
-                              onChange={(e) => handleInputChange("category", e.target.value)}
-                              placeholder="Enter category"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Price <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              type="number"
-                              min="0"
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              value={
-                                typeof editedItem.price === "number"
-                                  ? editedItem.price
-                                  : editedItem.price?.toString().replace(/[₹,]/g, "") || ""
-                              }
-                              onChange={(e) => handleInputChange("price", Number(e.target.value) || 0)}
-                              placeholder="Enter price"
-                              required
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Original Price</label>
-                            <input
-                              type="number"
-                              min="0"
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              value={
-                                typeof editedItem.originalPrice === "number"
-                                  ? editedItem.originalPrice
-                                  : editedItem.originalPrice?.toString().replace(/[₹,]/g, "") || ""
-                              }
-                              onChange={(e) => handleInputChange("originalPrice", Number(e.target.value) || 0)}
-                              placeholder="Enter original price"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Destination</label>
-                          <textarea
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            rows={3}
-                            value={editedItem.address || ""}
-                            onChange={(e) => handleInputChange("address", e.target.value)}
-                            placeholder="Enter destination address"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Overview</label>
-                          <textarea
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            rows={4}
-                            value={editedItem.overview || ""}
-                            onChange={(e) => handleInputChange("overview", e.target.value)}
-                            placeholder="Enter package overview"
-                          />
                         </div>
                       </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => featureImageInputRef.current?.click()}
+                        className="flex-1 p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors flex items-center justify-center bg-white"
+                        disabled={uploadingImages.featureImage}
+                      >
+                        <Upload className="h-5 w-5 mr-2" />
+                        {uploadingImages.featureImage
+                          ? "Uploading to Cloudinary..."
+                          : editedItem?.featureImage
+                            ? "Change Feature Image"
+                            : "Upload Feature Image"}
+                      </button>
+
+                      {!imageEditMode.featureImage && (
+                        <button
+                          onClick={() => setImageEditMode({ ...imageEditMode, featureImage: true })}
+                          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+                        >
+                          URL
+                        </button>
+                      )}
                     </div>
 
-                    {/* Itinerary Section */}
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Itinerary</h4>
-                      <div className="space-y-3 max-h-60 overflow-y-auto">
-                        {editedItem.itinerary?.map((day, index) => (
-                          <div key={index} className="bg-white p-4 rounded-lg border border-gray-200">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="font-medium text-sm text-gray-900">Day {day.day}</span>
-                              <button
-                                onClick={() => {
-                                  const newItinerary = editedItem.itinerary.filter((_, i) => i !== index)
-                                  handleInputChange("itinerary", newItinerary)
-                                }}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                <Minus className="h-4 w-4" />
-                              </button>
-                            </div>
-                            <input
-                              type="text"
-                              className="w-full p-2 border border-gray-300 rounded mb-2 text-sm"
-                              value={day.title || ""}
-                              onChange={(e) => {
-                                const newItinerary = [...editedItem.itinerary]
-                                newItinerary[index] = { ...newItinerary[index], title: e.target.value }
-                                handleInputChange("itinerary", newItinerary)
-                              }}
-                              placeholder="Day title"
-                            />
-                            <textarea
-                              className="w-full p-2 border border-gray-300 rounded text-sm"
-                              rows={2}
-                              value={day.description || ""}
-                              onChange={(e) => {
-                                const newItinerary = [...editedItem.itinerary]
-                                newItinerary[index] = { ...newItinerary[index], description: e.target.value }
-                                handleInputChange("itinerary", newItinerary)
-                              }}
-                              placeholder="Day description"
-                            />
-                          </div>
-                        ))}
+                    {imageEditMode.featureImage && (
+                      <div className="flex gap-2">
+                        <input
+                          type="url"
+                          className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          value={editedItem?.featureImage || ""}
+                          onChange={(e) => handleImageEdit("featureImage", e.target.value)}
+                          placeholder="Enter feature image URL"
+                        />
                         <button
-                          onClick={() => {
-                            const newDay = {
-                              day: (editedItem.itinerary?.length || 0) + 1,
-                              title: "",
-                              description: "",
-                              accommodation: "",
-                            }
-                            handleInputChange("itinerary", [...(editedItem.itinerary || []), newDay])
-                          }}
-                          className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors flex items-center justify-center"
+                          onClick={() => setImageEditMode({ ...imageEditMode, featureImage: false })}
+                          className="px-3 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50"
                         >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Day
+                          <X className="h-4 w-4" />
                         </button>
                       </div>
-                    </div>
-                  </div>
+                    )}
 
-                  {/* Right Column - Images and Lists */}
-                  <div className="space-y-6">
-                    {/* Image Management */}
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <Camera className="h-5 w-5 mr-2 text-blue-600" />
-                        Image Management
-                      </h4>
-
-                      {/* Hero Image */}
-                      <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Hero Image</label>
-                        <div className="space-y-3">
-                          {editedItem.heroImage && (
-                            <div className="relative group">
-                              <img
-                                src={editedItem.heroImage || "/placeholder.svg?height=200&width=300"}
-                                alt="Hero"
-                                className="w-full h-40 object-cover rounded-lg border border-gray-200"
-                                onError={(e) => {
-                                  e.target.src = "/placeholder.svg?height=200&width=300"
-                                }}
-                              />
-                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center">
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <button
-                                    onClick={() => heroImageInputRef.current?.click()}
-                                    className="bg-white text-gray-700 px-3 py-2 rounded-md text-sm shadow-lg hover:bg-gray-50"
-                                    disabled={uploadingImages.hero}
-                                  >
-                                    {uploadingImages.hero ? "Uploading..." : "Change"}
-                                  </button>
-                                  <button
-                                    onClick={() => handleInputChange("heroImage", "")}
-                                    className="bg-red-500 text-white px-3 py-2 rounded-md text-sm shadow-lg hover:bg-red-600"
-                                  >
-                                    Remove
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => heroImageInputRef.current?.click()}
-                              className="flex-1 p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors flex items-center justify-center bg-white"
-                              disabled={uploadingImages.hero}
-                            >
-                              <Upload className="h-5 w-5 mr-2" />
-                              {uploadingImages.hero
-                                ? "Uploading to Cloudinary..."
-                                : editedItem.heroImage
-                                  ? "Change Hero Image"
-                                  : "Upload Hero Image"}
-                            </button>
-
-                            {!imageEditMode.heroImage && (
-                              <button
-                                onClick={() => setImageEditMode({ ...imageEditMode, heroImage: true })}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-                              >
-                                URL
-                              </button>
-                            )}
-                          </div>
-
-                          {imageEditMode.heroImage && (
-                            <div className="flex gap-2">
-                              <input
-                                type="url"
-                                className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                value={editedItem.heroImage || ""}
-                                onChange={(e) => handleImageEdit("heroImage", e.target.value)}
-                                placeholder="Enter hero image URL"
-                              />
-                              <button
-                                onClick={() => setImageEditMode({ ...imageEditMode, heroImage: false })}
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50"
-                              >
-                                <X className="h-4 w-4" />
-                              </button>
-                            </div>
-                          )}
-
-                          <input
-                            ref={heroImageInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0]
-                              if (file) {
-                                handleImageUpload(file, "hero")
-                              }
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Multiple Images */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Gallery Images</label>
-                        <div className="space-y-3 max-h-60 overflow-y-auto">
-                          {editedItem.multipleImages?.map((image, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg bg-white"
-                            >
-                              <img
-                                src={image || "/placeholder.svg?height=60&width=60"}
-                                alt={`Gallery ${index + 1}`}
-                                className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                                onError={(e) => {
-                                  e.target.src = "/placeholder.svg?height=60&width=60"
-                                }}
-                              />
-
-                              {imageEditMode[`gallery-${index}`] ? (
-                                <div className="flex-1 flex gap-2">
-                                  <input
-                                    type="url"
-                                    className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    value={image}
-                                    onChange={(e) => handleImageEdit("multipleImages", e.target.value, index)}
-                                    placeholder="Image URL"
-                                  />
-                                  <button
-                                    onClick={() => setImageEditMode({ ...imageEditMode, [`gallery-${index}`]: false })}
-                                    className="px-2 py-1 border border-gray-300 rounded text-gray-600 hover:bg-gray-50"
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </button>
-                                </div>
-                              ) : (
-                                <div className="flex-1 flex items-center justify-between">
-                                  <span className="text-sm text-gray-600 truncate">Image {index + 1}</span>
-                                  <div className="flex gap-1">
-                                    <button
-                                      onClick={() => {
-                                        galleryImageInputRef.current?.click()
-                                        galleryImageInputRef.current?.setAttribute("data-index", index.toString())
-                                      }}
-                                      className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
-                                      disabled={uploadingImages[`gallery-${index}`]}
-                                    >
-                                      {uploadingImages[`gallery-${index}`] ? "..." : "Change"}
-                                    </button>
-                                    <button
-                                      onClick={() => setImageEditMode({ ...imageEditMode, [`gallery-${index}`]: true })}
-                                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-                                    >
-                                      URL
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-
-                              <button
-                                onClick={() => handleRemoveImage(index)}
-                                className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-md transition-colors"
-                              >
-                                <Minus className="h-4 w-4" />
-                              </button>
-                            </div>
-                          ))}
-
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                galleryImageInputRef.current?.click()
-                                galleryImageInputRef.current?.removeAttribute("data-index")
-                              }}
-                              className="flex-1 p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors flex items-center justify-center bg-white"
-                            >
-                              <Plus className="h-5 w-5 mr-2" />
-                              Upload New Image
-                            </button>
-
-                            <button
-                              onClick={() => handleImageEdit("multipleImages", "")}
-                              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-                            >
-                              Add URL
-                            </button>
-                          </div>
-
-                          <input
-                            ref={galleryImageInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0]
-                              const indexAttr = e.target.getAttribute("data-index")
-                              const index = indexAttr ? Number.parseInt(indexAttr) : null
-                              if (file) {
-                                handleImageUpload(file, "gallery", index)
-                              }
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Inclusions */}
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Inclusions</h4>
-                      <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {editedItem.inclusions?.map((inclusion, index) => (
-                          <div key={index} className="flex gap-2">
-                            <input
-                              type="text"
-                              className="flex-1 p-2 border border-gray-300 rounded text-sm"
-                              value={inclusion}
-                              onChange={(e) => {
-                                const newInclusions = [...editedItem.inclusions]
-                                newInclusions[index] = e.target.value
-                                handleInputChange("inclusions", newInclusions)
-                              }}
-                              placeholder="Enter inclusion"
-                            />
-                            <button
-                              onClick={() => {
-                                const newInclusions = editedItem.inclusions.filter((_, i) => i !== index)
-                                handleInputChange("inclusions", newInclusions)
-                              }}
-                              className="text-red-500 hover:text-red-700 p-2"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </button>
-                          </div>
-                        ))}
-                        <button
-                          onClick={() => {
-                            handleInputChange("inclusions", [...(editedItem.inclusions || []), ""])
-                          }}
-                          className="w-full p-2 border-2 border-dashed border-gray-300 rounded text-gray-600 hover:border-green-400 hover:text-green-600 transition-colors flex items-center justify-center text-sm"
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add Inclusion
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Exclusions */}
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Exclusions</h4>
-                      <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {editedItem.exclusions?.map((exclusion, index) => (
-                          <div key={index} className="flex gap-2">
-                            <input
-                              type="text"
-                              className="flex-1 p-2 border border-gray-300 rounded text-sm"
-                              value={exclusion}
-                              onChange={(e) => {
-                                const newExclusions = [...editedItem.exclusions]
-                                newExclusions[index] = e.target.value
-                                handleInputChange("exclusions", newExclusions)
-                              }}
-                              placeholder="Enter exclusion"
-                            />
-                            <button
-                              onClick={() => {
-                                const newExclusions = editedItem.exclusions.filter((_, i) => i !== index)
-                                handleInputChange("exclusions", newExclusions)
-                              }}
-                              className="text-red-500 hover:text-red-700 p-2"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </button>
-                          </div>
-                        ))}
-                        <button
-                          onClick={() => {
-                            handleInputChange("exclusions", [...(editedItem.exclusions || []), ""])
-                          }}
-                          className="w-full p-2 border-2 border-dashed border-gray-300 rounded text-gray-600 hover:border-red-400 hover:text-red-600 transition-colors flex items-center justify-center text-sm"
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add Exclusion
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Terms & Conditions */}
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Terms & Conditions</h4>
-                      <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {editedItem.termsAndConditions?.map((term, index) => (
-                          <div key={index} className="flex gap-2">
-                            <input
-                              type="text"
-                              className="flex-1 p-2 border border-gray-300 rounded text-sm"
-                              value={term}
-                              onChange={(e) => {
-                                const newTerms = [...editedItem.termsAndConditions]
-                                newTerms[index] = e.target.value
-                                handleInputChange("termsAndConditions", newTerms)
-                              }}
-                              placeholder="Enter term or condition"
-                            />
-                            <button
-                              onClick={() => {
-                                const newTerms = editedItem.termsAndConditions.filter((_, i) => i !== index)
-                                handleInputChange("termsAndConditions", newTerms)
-                              }}
-                              className="text-red-500 hover:text-red-700 p-2"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </button>
-                          </div>
-                        ))}
-                        <button
-                          onClick={() => {
-                            handleInputChange("termsAndConditions", [...(editedItem.termsAndConditions || []), ""])
-                          }}
-                          className="w-full p-2 border-2 border-dashed border-gray-300 rounded text-gray-600 hover:border-yellow-400 hover:text-yellow-600 transition-colors flex items-center justify-center text-sm"
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add Term
-                        </button>
-                      </div>
-                    </div>
+                    <input
+                      ref={featureImageInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          handleImageUpload(file, "featureImage")
+                        }
+                      }}
+                    />
                   </div>
                 </div>
-              </div>
 
-              {/* Modal Footer */}
-              <div className="flex justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Meta Title</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.extraTitle || ""}
+                    onChange={(e) => handleInputChange("extraTitle", e.target.value)}
+                    placeholder="Enter extra title"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Meta Description</label>
+                  <textarea
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={4}
+                    value={editedItem?.metaDescription || ""}
+                    onChange={(e) => handleInputChange("metaDescription", e.target.value)}
+                    placeholder="Enter meta description"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Meta Keywords</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedItem?.metaKeywords || ""}
+                    onChange={(e) => handleInputChange("metaKeywords", e.target.value)}
+                    placeholder="Enter meta keywords"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Itinerary (JSON)</label>
+                  <textarea
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={4}
+                    value={JSON.stringify(editedItem?.itinerary || []) || "[]"}
+                    onChange={(e) => {
+                      try {
+                        const parsedValue = JSON.parse(e.target.value)
+                        handleInputChange("itinerary", parsedValue)
+                      } catch (error) {
+                        console.error("Failed to parse itinerary JSON:", error)
+                        toast.error("Invalid JSON format for itinerary")
+                      }
+                    }}
+                    placeholder="Enter itinerary as JSON array"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Inclusions (Comma Separated)</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={(editedItem?.inclusions || []).join(", ")}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "inclusions",
+                        e.target.value.split(",").map((item) => item.trim()),
+                      )
+                    }
+                    placeholder="Enter inclusions, separated by commas"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Exclusions (Comma Separated)</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={(editedItem?.exclusions || []).join(", ")}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "exclusions",
+                        e.target.value.split(",").map((item) => item.trim()),
+                      )
+                    }
+                    placeholder="Enter exclusions, separated by commas"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Terms and Conditions (Comma Separated)
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={(editedItem?.termsAndConditions || []).join(", ")}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "termsAndConditions",
+                        e.target.value.split(",").map((item) => item.trim()),
+                      )
+                    }
+                    placeholder="Enter terms and conditions, separated by commas"
+                  />
+                </div>
+              </div>
+              <div className="mt-4 flex justify-end">
                 <button
-                  className="px-6 py-3 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-2"
                   onClick={() => {
                     setShowEditModal(false)
-                    setEditedItem(null)
                     setSelectedItem(null)
+                    setEditedItem(null)
                     setImageEditMode({})
                   }}
                 >
                   Cancel
                 </button>
                 <button
-                  className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   onClick={handleSaveEdit}
-                  disabled={!editedItem?.headline?.trim() || !editedItem?.price || Number(editedItem.price) <= 0}
                 >
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Changes
+                  Save
                 </button>
               </div>
             </div>

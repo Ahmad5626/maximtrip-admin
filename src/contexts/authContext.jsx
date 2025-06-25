@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
      const [formData, setFormData] = useState({
         headline: '',
         days: '',
+        rating : '0 star',
         address: '',
         overview: '',
         heroImage: '',
@@ -51,15 +52,7 @@ export const AuthProvider = ({ children }) => {
         },
         
         tags: [''],
-        location: {
-          country: '',
-          state: '',
-          city: '',
-          coordinates: {
-            latitude: '',
-            longitude: ''
-          }
-        }
+        
       });
       const [uploadingHero, setUploadingHero] = useState(false)
     const [createCategoryFormData, setCreateCategoryFormData]=useState(initialCreateCategoryData)
@@ -309,7 +302,11 @@ try {
 
    
 const handleDeleteBlog=async(id)=>{
-  const data=await deleteBlog(id)
+  const isConfirmed = window.confirm("Are you sure you want to delete this destinations? This action cannot be undone.")
+  if(isConfirmed){
+    
+    const data=await deleteBlog(id)
+  }
  try {
    if(data.success){
     toast.success("Blog deleted successfully");
@@ -383,7 +380,12 @@ const handleSubmitCreateDestinations=async(e)=>{
 
    
 const handleDeleteDestinations=async(id)=>{
-  const data=await deleteDestinations(id)
+  const isConfirmed = window.confirm("Are you sure you want to delete this destinations? This action cannot be undone.")
+
+  if (isConfirmed) {
+    const data=await deleteDestinations(id)
+  }
+  
 try {
     if(data.success){
     toast.success("destinations deleted successfully");
@@ -457,7 +459,11 @@ try {
 
    
 const handleDeletePage=async(id)=>{
+   const isConfirmed = window.confirm("Are you sure you want to delete this Page? This action cannot be undone.")
+if(isConfirmed){
+  
   const data=await deletePage(id)
+}
  try {
    if(data.success){
     toast.success("Page deleted successfully");

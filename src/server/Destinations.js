@@ -2,7 +2,7 @@ import { baseApi } from "../utils/constant";
 
 export const createDestinations = async (formData) => {
     try {
-        const data = await fetch(`${baseAPI}/v1/api/create-destination`, {
+        const data = await fetch(`${baseApi}/v1/api/create-destination`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

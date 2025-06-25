@@ -50,12 +50,17 @@ console.log(emailValue);
         <>
             <main className="h-[100dvh] flex items-center justify-center  bg-center px-4 sm:px-6 lg:px-8">
                 <Toaster position="top-center" />
-                <div className="w-[320px] min-h-96 px-8 py-6 text-left bg-[#ffffff] border bg-opacity-100 backdrop-blur-lg rounded-xl shadow-2xl">
+                <div className="w-[320px] min-h-96 px-8 py-2 text-left bg-[#ffffff] border bg-opacity-100 backdrop-blur-lg rounded-xl shadow-2xl">
                     <form onSubmit={handleloginDashboard}>
                         <div className="flex flex-col h-full select-none">
-                        <h1 className="text-2xl font-bold mb-4 text-center"> Admin Login</h1>
                             <div className="mb-2 flex justify-center">
-                                <img src="/img/maximtrip-logo.png" className="w-[250px]" style={{ fllter: "brightness(10)" }} />
+                                <img src="/img/maximtrip-logo.png" className="w-[270px]" style={{ fllter: "brightness(10)" }} />
+                            </div>
+                            <div className="mx-auto">
+
+                        <h1 className="text-2xl font-bold  text-center text-[#f5070f]">  Login</h1>
+                        <div className="mb-4 w-[100%] h-[2px]  bg-gradient-to-r from-[#f5070f] to-transparent rounded-4xl"></div>
+
                             </div>
 
                              <div className="w-full flex flex-col gap-2">

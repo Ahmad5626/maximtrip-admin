@@ -3,454 +3,317 @@
 import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Link from "@tiptap/extension-link"
-import Underline from "@tiptap/extension-underline"
-import TextAlign from "@tiptap/extension-text-align"
-import Highlight from "@tiptap/extension-highlight"
-import { useState, useCallback, useEffect } from "react"
+import Image from "@tiptap/extension-image"
 import {
   Bold,
   Italic,
-  UnderlineIcon,
   Strikethrough,
   Code,
-  Heading1,
-  Heading2,
-  Heading3,
-  Heading4,
-  Heading5,
-  Heading6,
   List,
   ListOrdered,
   Quote,
   Undo,
   Redo,
   LinkIcon,
-  Unlink,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
-  Highlighter,
-  Type,
-  Eye,
-  EyeOff,
+  ImageIcon,
+  Upload,
   ChevronDown,
 } from "lucide-react"
+import { useState, useRef } from "react"
 
-const TiptapEditor = ({ content, onChange, placeholder = "Start writing..." }) => {
-  const [showLinkModal, setShowLinkModal] = useState(false)
-  const [linkUrl, setLinkUrl] = useState("")
-  const [linkText, setLinkText] = useState("")
-  const [showPreview, setShowPreview] = useState(false)
+const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
   const [showHeadingDropdown, setShowHeadingDropdown] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const fileInputRef = useRef(null)
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3, 4, 5, 6],
-        },
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-      }),
+      StarterKit,
       Link.configure({
         openOnClick: false,
+      }),
+      Image.configure({
         HTMLAttributes: {
-          class: "text-blue-600 hover:text-blue-800 underline cursor-pointer",
-          target: "_blank",
-          rel: "noopener noreferrer",
+          class: "max-w-full h-auto rounded-lg",
         },
       }),
-      Underline,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      Highlight.configure({
-        multicolor: true,
-      }),
     ],
-    content: content,
+    content: value,
     onUpdate: ({ editor }) => {
-      const html = editor.getHTML()
-      onChange(html)
+      onChange(editor.getHTML())
     },
     editorProps: {
       attributes: {
-        class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] p-4",
+        class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] p-4 border-0",
       },
     },
   })
 
-  // Update editor content when prop changes
-  useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content)
-    }
-  }, [content, editor])
-
-  const setLink = useCallback(() => {
-    if (!editor) return
-
-    const previousUrl = editor.getAttributes("link").href
-    const selection = editor.state.selection
-    const selectedText = editor.state.doc.textBetween(selection.from, selection.to)
-
-    setLinkText(selectedText || "")
-    setLinkUrl(previousUrl || "")
-    setShowLinkModal(true)
-  }, [editor])
-
-  const handleSetLink = () => {
-    if (!editor) return
-
-    if (linkUrl === "") {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run()
-      setShowLinkModal(false)
-      return
-    }
-
-    // If there's selected text, use it; otherwise use the link text from modal
-    const selection = editor.state.selection
-    const hasSelection = !selection.empty
-
-    if (hasSelection) {
-      // Update existing selection with link
-      editor.chain().focus().extendMarkRange("link").setLink({ href: linkUrl }).run()
-    } else {
-      // Insert new text with link
-      editor.chain().focus().insertContent(`<a href="${linkUrl}">${linkText}</a>`).run()
-    }
-
-    setShowLinkModal(false)
-    setLinkUrl("")
-    setLinkText("")
-  }
-
-  const unsetLink = useCallback(() => {
-    if (!editor) return
-    editor.chain().focus().unsetLink().run()
-  }, [editor])
-
-  const getCurrentHeadingLevel = () => {
-    if (!editor) return null
-    for (let level = 1; level <= 6; level++) {
-      if (editor.isActive("heading", { level })) {
-        return level
-      }
-    }
+  if (!editor) {
     return null
   }
 
-  const getCurrentHeadingText = () => {
-    const level = getCurrentHeadingLevel()
-    if (level) return `H${level}`
-    if (editor?.isActive("paragraph")) return "P"
-    return "¶"
+  const addImageFromUrl = () => {
+    const url = window.prompt("Enter image URL:")
+    if (url) {
+      editor.chain().focus().setImage({ src: url }).run()
+    }
   }
 
-  if (!editor) {
-    return (
-      <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
-        <div className="animate-pulse">Loading editor...</div>
-      </div>
-    )
+  const handleImageUpload = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Check if file is an image
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file")
+      return
+    }
+
+    setUploadingImage(true)
+
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const base64String = reader.result
+      editor.chain().focus().setImage({ src: base64String }).run()
+      setUploadingImage(false)
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
+    }
+    reader.onerror = () => {
+      alert("Error reading file")
+      setUploadingImage(false)
+    }
+    reader.readAsDataURL(file)
   }
 
-  const ToolbarButton = ({ onClick, isActive, disabled, children, title }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-      className={`p-2 rounded transition-colors ${
-        isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"
-      } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-    >
-      {children}
-    </button>
-  )
+  const addLink = () => {
+    const url = window.prompt("Enter URL:")
+    if (url) {
+      editor.chain().focus().setLink({ href: url }).run()
+    }
+  }
 
-  const headingOptions = [
-    { level: null, label: "Paragraph", icon: <Type className="w-4 h-4" /> },
-    { level: 1, label: "Heading 1", icon: <Heading1 className="w-4 h-4" /> },
-    { level: 2, label: "Heading 2", icon: <Heading2 className="w-4 h-4" /> },
-    { level: 3, label: "Heading 3", icon: <Heading3 className="w-4 h-4" /> },
-    { level: 4, label: "Heading 4", icon: <Heading4 className="w-4 h-4" /> },
-    { level: 5, label: "Heading 5", icon: <Heading5 className="w-4 h-4" /> },
-    { level: 6, label: "Heading 6", icon: <Heading6 className="w-4 h-4" /> },
-  ]
+  const setHeading = (level) => {
+    if (level === 0) {
+      editor.chain().focus().setParagraph().run()
+    } else {
+      editor.chain().focus().toggleHeading({ level }).run()
+    }
+    setShowHeadingDropdown(false)
+  }
+
+  const getActiveHeading = () => {
+    if (editor.isActive("heading", { level: 1 })) return "H1"
+    if (editor.isActive("heading", { level: 2 })) return "H2"
+    if (editor.isActive("heading", { level: 3 })) return "H3"
+    if (editor.isActive("heading", { level: 4 })) return "H4"
+    if (editor.isActive("heading", { level: 5 })) return "H5"
+    if (editor.isActive("heading", { level: 6 })) return "H6"
+    return "Normal"
+  }
 
   return (
-    <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+    <div className="border rounded-lg">
       {/* Toolbar */}
-      <div className="border-b border-gray-200 p-2 bg-gray-50">
-        <div className="flex flex-wrap gap-1">
-          {/* Text Formatting */}
-          <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleBold().run()}
-              isActive={editor.isActive("bold")}
-              title="Bold"
-            >
-              <Bold className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-              isActive={editor.isActive("italic")}
-              title="Italic"
-            >
-              <Italic className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleUnderline().run()}
-              isActive={editor.isActive("underline")}
-              title="Underline"
-            >
-              <UnderlineIcon className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleStrike().run()}
-              isActive={editor.isActive("strike")}
-              title="Strikethrough"
-            >
-              <Strikethrough className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleHighlight().run()}
-              isActive={editor.isActive("highlight")}
-              title="Highlight"
-            >
-              <Highlighter className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
+      <div className="border-b p-2 flex flex-wrap gap-1 items-center">
+        {/* Heading Dropdown */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowHeadingDropdown(!showHeadingDropdown)}
+            className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium min-w-[80px] justify-between"
+          >
+            {getActiveHeading()}
+            <ChevronDown className="w-3 h-3" />
+          </button>
 
-          {/* Headings Dropdown */}
-          <div className="relative border-r border-gray-300 pr-2 mr-2">
-            <button
-              type="button"
-              onClick={() => setShowHeadingDropdown(!showHeadingDropdown)}
-              className={`flex items-center gap-1 p-2 rounded transition-colors ${
-                getCurrentHeadingLevel() ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"
-              }`}
-              title="Text Format"
-            >
-              <span className="text-sm font-medium min-w-[20px]">{getCurrentHeadingText()}</span>
-              <ChevronDown className="w-3 h-3" />
-            </button>
-
-            {showHeadingDropdown && (
-              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[140px]">
-                {headingOptions.map((option) => (
-                  <button
-                    key={option.level || "paragraph"}
-                    type="button"
-                    onClick={() => {
-                      if (option.level) {
-                        editor.chain().focus().toggleHeading({ level: option.level }).run()
-                      } else {
-                        editor.chain().focus().setParagraph().run()
-                      }
-                      setShowHeadingDropdown(false)
-                    }}
-                    className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50 ${
-                      option.level
-                        ? editor.isActive("heading", { level: option.level })
-                          ? "bg-blue-50 text-blue-700"
-                          : ""
-                        : editor.isActive("paragraph")
-                          ? "bg-blue-50 text-blue-700"
-                          : ""
-                    }`}
-                  >
-                    {option.icon}
-                    <span className="text-sm">{option.label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Lists and Quotes */}
-          <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
-              isActive={editor.isActive("bulletList")}
-              title="Bullet List"
-            >
-              <List className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
-              isActive={editor.isActive("orderedList")}
-              title="Numbered List"
-            >
-              <ListOrdered className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleBlockquote().run()}
-              isActive={editor.isActive("blockquote")}
-              title="Quote"
-            >
-              <Quote className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleCode().run()}
-              isActive={editor.isActive("code")}
-              title="Inline Code"
-            >
-              <Code className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
-
-          {/* Links */}
-          <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
-            <ToolbarButton onClick={setLink} isActive={editor.isActive("link")} title="Add Link">
-              <LinkIcon className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton onClick={unsetLink} disabled={!editor.isActive("link")} title="Remove Link">
-              <Unlink className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
-
-          {/* Text Alignment */}
-          <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().setTextAlign("left").run()}
-              isActive={editor.isActive({ textAlign: "left" })}
-              title="Align Left"
-            >
-              <AlignLeft className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().setTextAlign("center").run()}
-              isActive={editor.isActive({ textAlign: "center" })}
-              title="Align Center"
-            >
-              <AlignCenter className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().setTextAlign("right").run()}
-              isActive={editor.isActive({ textAlign: "right" })}
-              title="Align Right"
-            >
-              <AlignRight className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().setTextAlign("justify").run()}
-              isActive={editor.isActive({ textAlign: "justify" })}
-              title="Justify"
-            >
-              <AlignJustify className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
-
-          {/* Undo/Redo */}
-          <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().undo().run()}
-              disabled={!editor.can().chain().focus().undo().run()}
-              title="Undo"
-            >
-              <Undo className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().redo().run()}
-              disabled={!editor.can().chain().focus().redo().run()}
-              title="Redo"
-            >
-              <Redo className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
-
-          {/* Preview Toggle */}
-          <div className="flex gap-1">
-            <ToolbarButton
-              onClick={() => setShowPreview(!showPreview)}
-              isActive={showPreview}
-              title={showPreview ? "Edit Mode" : "Preview Mode"}
-            >
-              {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </ToolbarButton>
-          </div>
+          {showHeadingDropdown && (
+            <div className="absolute top-full left-0 mt-1 bg-white border rounded-lg shadow-lg z-10 min-w-[120px]">
+              <button
+                type="button"
+                onClick={() => setHeading(0)}
+                className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+              >
+                Normal
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeading(1)}
+                className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-xl font-bold"
+              >
+                Heading 1
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeading(2)}
+                className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+              >
+                Heading 2
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeading(3)}
+                className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-base font-bold"
+              >
+                Heading 3
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeading(4)}
+                className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm font-bold"
+              >
+                Heading 4
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeading(5)}
+                className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-xs font-bold"
+              >
+                Heading 5
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeading(6)}
+                className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-xs font-bold"
+              >
+                Heading 6
+              </button>
+            </div>
+          )}
         </div>
+
+        <div className="w-px h-8 bg-gray-300 mx-1" />
+
+        {/* Text Formatting */}
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("bold") ? "bg-gray-200" : ""}`}
+          title="Bold"
+        >
+          <Bold className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("italic") ? "bg-gray-200" : ""}`}
+          title="Italic"
+        >
+          <Italic className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleStrike().run()}
+          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("strike") ? "bg-gray-200" : ""}`}
+          title="Strikethrough"
+        >
+          <Strikethrough className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleCode().run()}
+          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("code") ? "bg-gray-200" : ""}`}
+          title="Code"
+        >
+          <Code className="w-4 h-4" />
+        </button>
+
+        <div className="w-px h-8 bg-gray-300 mx-1" />
+
+        {/* Lists */}
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("bulletList") ? "bg-gray-200" : ""}`}
+          title="Bullet List"
+        >
+          <List className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("orderedList") ? "bg-gray-200" : ""}`}
+          title="Numbered List"
+        >
+          <ListOrdered className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("blockquote") ? "bg-gray-200" : ""}`}
+          title="Quote"
+        >
+          <Quote className="w-4 h-4" />
+        </button>
+
+        <div className="w-px h-8 bg-gray-300 mx-1" />
+
+        {/* Links and Images */}
+        <button type="button" onClick={addLink} className="p-2 rounded hover:bg-gray-100" title="Add Link">
+          <LinkIcon className="w-4 h-4" />
+        </button>
+
+        {/* Image Upload Button */}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="p-2 rounded hover:bg-gray-100"
+          disabled={uploadingImage}
+          title="Upload Image"
+        >
+          {uploadingImage ? (
+            <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+          ) : (
+            <Upload className="w-4 h-4" />
+          )}
+        </button>
+
+        {/* Image URL Button */}
+        <button
+          type="button"
+          onClick={addImageFromUrl}
+          className="p-2 rounded hover:bg-gray-100"
+          title="Add Image from URL"
+        >
+          <ImageIcon className="w-4 h-4" />
+        </button>
+
+        <div className="w-px h-8 bg-gray-300 mx-1" />
+
+        {/* Undo/Redo */}
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().undo().run()}
+          className="p-2 rounded hover:bg-gray-100"
+          disabled={!editor.can().undo()}
+          title="Undo"
+        >
+          <Undo className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().redo().run()}
+          className="p-2 rounded hover:bg-gray-100"
+          disabled={!editor.can().redo()}
+          title="Redo"
+        >
+          <Redo className="w-4 h-4" />
+        </button>
+
+        {/* Hidden File Input */}
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
       </div>
 
       {/* Editor Content */}
-      <div className="min-h-[200px] max-h-[500px] overflow-y-auto">
-        {showPreview ? (
-          <div className="p-4 prose prose-sm max-w-none">
-            <div dangerouslySetInnerHTML={{ __html: editor.getHTML() }} />
-          </div>
-        ) : (
-          <EditorContent editor={editor} className="min-h-[200px]" />
-        )}
+      <div className="min-h-[200px] p-4">
+        <EditorContent editor={editor} placeholder={placeholder} />
       </div>
-
-      {/* Character Count */}
-      <div className="border-t border-gray-200 px-4 py-2 bg-gray-50 text-xs text-gray-500 flex justify-between">
-        <span>{editor.storage.characterCount?.characters() || 0} characters</span>
-        <span>{editor.storage.characterCount?.words() || 0} words</span>
-      </div>
-
-      {/* Link Modal */}
-      {showLinkModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Add Link</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Link Text</label>
-                <input
-                  type="text"
-                  value={linkText}
-                  onChange={(e) => setLinkText(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter link text"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
-                <input
-                  type="url"
-                  value={linkUrl}
-                  onChange={(e) => setLinkUrl(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://example.com"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowLinkModal(false)
-                  setLinkText("")
-                  setLinkUrl("")
-                }}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSetLink}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Add Link
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Click outside to close dropdown */}
-      {showHeadingDropdown && <div className="fixed inset-0 z-5" onClick={() => setShowHeadingDropdown(false)} />}
+      {showHeadingDropdown && <div className="fixed inset-0 z-0" onClick={() => setShowHeadingDropdown(false)} />}
     </div>
   )
 }

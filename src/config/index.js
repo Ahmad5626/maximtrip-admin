@@ -33,7 +33,12 @@ export const initialCreateCategoryData={
     headline: "",
    image: "",
    categoryName: "",
-    story:""
+   Slug: "",
+   detail: "",
+   subcategoryFAQ: "",
+   metaTitle: "",
+   metaDiscription: "",
+   metaKeywords: "",
     
 }
 export const initialCreateBlogData={
