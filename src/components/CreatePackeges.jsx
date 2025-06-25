@@ -277,7 +277,7 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
       bestPrice: "",
       maxPrice: "",
       slug: "",
-      rating : "0 star",
+      rating : "0",
       cityRoute: "",
       featureImage: "",
       location: "",
@@ -469,17 +469,17 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Rating </label>
                <select 
                   name="rating"
-                  value={formData.rating  || " 0 Star"}
+                  value={formData.rating  || " 0 "}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#ce3c3d]"
                   
                >
-                  <option value="0 Star">0 Star</option>
-                  <option value="1 Star">1 Star</option>
-                  <option value="2 Star">2 Star</option>
-                  <option value="3 Star">3 Star</option>
-                  <option value="4 Star">4 Star</option>
-                  <option value="5 Star">5 Star</option>
+                  <option value="0 ">0 </option>
+                  <option value="1 ">1 </option>
+                  <option value="2 ">2 </option>
+                  <option value="3 ">3 </option>
+                  <option value="4 ">4 </option>
+                  <option value="5 ">5 </option>
                </select>
               </div>
 
