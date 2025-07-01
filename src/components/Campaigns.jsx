@@ -401,7 +401,7 @@ function App() {
         slug: editedItem.slug, // Added slug
         rating: editedItem.rating, // Added rating
         cityRoute: editedItem.cityRoute, // Added cityRoute
-        featured: editedItem.featured, // Added featured
+        showInSlider: editedItem.showInSlider, // Added showInSlider
 
         packageCategory: editedItem.packageCategory,
         highlights: editedItem.highlights, // Added highlights
@@ -982,7 +982,7 @@ function App() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Days</label>
                   <input
-                    type="number"
+                    type="text"
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={editedItem?.days || ""}
                     onChange={(e) => handleInputChange("days", e.target.value)}
@@ -1062,30 +1062,31 @@ function App() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Featured</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">showInSlider</label>
                   <select
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={editedItem?.featured || false}
-                    onChange={(e) => handleInputChange("featured", e.target.value === "true")}
+                    value={editedItem?.showInSlider }
+                    onChange={(e) => handleInputChange("showInSlider", e.target.value )}
                   >
-                    <option value={true}>True</option>
-                    <option value={false}>False</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Overview</label>
                   <TiptapEditor
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="max-h-[300px] overflow-y-auto w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows={4}
                     value={editedItem?.overview || ""}
                     onChange={(content) => handleInputChange("overview", content)}
                     placeholder="Enter package overview"
+                   
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Highlights</label>
                   <TiptapEditor
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="max-h-[300px] overflow-y-auto w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows={4}
                     value={editedItem?.highlights || ""}
                     onChange={(content) => handleInputChange("highlights", content)}
@@ -1095,7 +1096,7 @@ function App() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Meals</label>
                   <TiptapEditor
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="max-h-[300px] overflow-y-auto w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows={4}
                     value={editedItem?.meals || ""}
                     onChange={(content) => handleInputChange("meals", content)}
@@ -1105,7 +1106,7 @@ function App() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Transfer</label>
                   <TiptapEditor
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="max-h-[300px] overflow-y-auto w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows={4}
                     value={editedItem?.transfer || ""}
                     onChange={(content) => handleInputChange("transfer", content)}
@@ -1115,7 +1116,7 @@ function App() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Hotel</label>
                   <TiptapEditor
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="max-h-[300px] overflow-y-auto w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows={4}
                     value={editedItem?.hotel || ""}
                     onChange={(content) => handleInputChange("hotel", content)}
@@ -1125,7 +1126,7 @@ function App() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Sightseeing</label>
                   <TiptapEditor
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="max-h-[300px] overflow-y-auto w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows={4}
                     value={editedItem?.sightseeing || ""}
                     onChange={(content) => handleInputChange("sightseeing", content)}

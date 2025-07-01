@@ -318,6 +318,7 @@ const CreateDestinations = () => {
                 value={createDestinationsFormData.description || ""}
                 onChange={handleContentChange}
                 placeholder="Write your destination content here..."
+                className="max-h-[300px] overflow-y-auto"
               />
             </div>
 
@@ -646,6 +647,7 @@ const CreateDestinations = () => {
                     value={editDescriptionContent}
                     onChange={handleEditDescriptionChange}
                     placeholder="Enter detailed description..."
+                    className="max-h-[300px] overflow-y-auto"
                   />
                 </div>
 

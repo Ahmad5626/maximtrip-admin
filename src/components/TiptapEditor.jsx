@@ -14,7 +14,8 @@ import Table from "@tiptap/extension-table"
 import TableCell from "@tiptap/extension-table-cell"
 import TableHeader from "@tiptap/extension-table-header"
 import TableRow from "@tiptap/extension-table-row"
-import FontSize from "@tiptap/extension-font-size" // Add this import
+import FontSize from "@tiptap/extension-font-size"
+import FontFamily from "@tiptap/extension-font-family"
 import {
   Bold,
   Italic,
@@ -39,14 +40,16 @@ import {
   TableIcon,
   Type,
   Plus,
+  
 } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
 
-const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
+const TiptapEditor = ({ value, onChange, placeholder = "Start typing...",className = "" }) => {
   const [showHeadingDropdown, setShowHeadingDropdown] = useState(false)
   const [showTextColorPicker, setShowTextColorPicker] = useState(false)
   const [showBgColorPicker, setShowBgColorPicker] = useState(false)
   const [showFontSizeDropdown, setShowFontSizeDropdown] = useState(false)
+  const [showFontFamilyDropdown, setShowFontFamilyDropdown] = useState(false)
   const [showSpecialChars, setShowSpecialChars] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [activeFormats, setActiveFormats] = useState({
@@ -63,6 +66,7 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
     heading: null,
     link: false,
     fontSize: null,
+    fontFamily: null,
   })
   const fileInputRef = useRef(null)
 
@@ -93,7 +97,10 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
       TableRow,
       TableHeader,
       TableCell,
-       FontSize.configure({ // Add the FontSize extension
+      FontSize.configure({
+        types: ['textStyle'],
+      }),
+      FontFamily.configure({
         types: ['textStyle'],
       }),
     ],
@@ -111,8 +118,10 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
 
   const updateActiveFormats = (editor) => {
     if (!editor) return
-    // Get current font size from the editor's attributes
+    
     const currentFontSize = editor.getAttributes('textStyle').fontSize || null
+    const currentFontFamily = editor.getAttributes('textStyle').fontFamily || null
+    
     setActiveFormats({
       bold: editor.isActive('bold'),
       italic: editor.isActive('italic'),
@@ -137,12 +146,12 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
         editor.isActive('heading', { level: 6 }) ? 6 : null,
       link: editor.isActive('link'),
       fontSize: currentFontSize,
+      fontFamily: currentFontFamily,
     })
   }
 
   useEffect(() => {
     if (editor) {
-      // Set up event listeners for real-time updates
       editor.on('selectionUpdate', ({ editor }) => {
         updateActiveFormats(editor)
       })
@@ -150,7 +159,6 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
         updateActiveFormats(editor)
       })
       
-      // Initialize active formats
       updateActiveFormats(editor)
     }
 
@@ -166,7 +174,6 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
     return null
   }
 
-  
   const setFontSize = (size) => {
     if (size === 'default') {
       editor.chain().focus().unsetFontSize().run()
@@ -174,6 +181,15 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
       editor.chain().focus().setFontSize(size).run()
     }
     setShowFontSizeDropdown(false)
+  }
+
+  const setFontFamily = (font) => {
+    if (font === 'default') {
+      editor.chain().focus().unsetFontFamily().run()
+    } else {
+      editor.chain().focus().setFontFamily(font).run()
+    }
+    setShowFontFamilyDropdown(false)
   }
 
   const addImageFromUrl = () => {
@@ -253,9 +269,20 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
     "©", "®", "™", "€", "£", "¥", "¢", "§", "¶", "•", "–", "—", "±", "×", "÷", "≠", "≈", "≤", "≥", "∞", "°", "µ", "π", "Ω", "∑", "√", "∆", "∏", "∫", "≈", "‰", "…", "←", "→", "↑", "↓", "↔", "↵", "⇐", "⇒", "⇑", "⇓", "⇔", "♠", "♣", "♥", "♦", "✓", "✔", "☆", "★", "☀", "☁", "☂", "☃", "☎", "☑", "☝", "☺", "♀", "♂", "♫", "⚓", "⚠", "⚡", "⛄", "⛔", "✂", "✈", "✉", "✌", "✍", "✏", "✒", "✔", "✖", "✝", "✡", "✨", "✳", "✴", "❄", "❌", "❎", "❤", "➡", "⏱", "⏲", "⏰", "⌛", "⏳"
   ]
 
+  const fontFamilies = [
+    { name: 'Default', value: 'default' },
+    { name: 'Arial', value: 'Arial, sans-serif' },
+    { name: 'Times New Roman', value: 'Times New Roman, serif' },
+    { name: 'Courier New', value: 'Courier New, monospace' },
+    { name: 'Georgia', value: 'Georgia, serif' },
+    { name: 'Verdana', value: 'Verdana, sans-serif' },
+    { name: 'Comic Sans MS', value: 'Comic Sans MS, cursive' },
+    { name: 'Impact', value: 'Impact, sans-serif' },
+    { name: 'Monospace', value: 'monospace' },
+  ]
+
   return (
     <div className="border rounded-lg">
-      {/* Toolbar */}
       <div className="border-b p-2 flex flex-wrap gap-1 items-center">
         {/* Heading Dropdown */}
         <div className="relative">
@@ -325,13 +352,44 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
 
         <div className="w-px h-8 bg-gray-300 mx-1" />
 
-        {/* Font Size Dropdown */}
-       <div className="border rounded-lg">
-      {/* Toolbar */}
-      <div className="border-b p-2 flex flex-wrap gap-1 items-center">
-        {/* ... (other toolbar elements) */}
+        {/* Font Family Dropdown */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowFontFamilyDropdown(!showFontFamilyDropdown)}
+            className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium"
+            title="Font Family"
+          >
+            <div className="w-4 h-4" />
+            <span className="text-xs">
+              {activeFormats.fontFamily ? 
+                fontFamilies.find(f => f.value === activeFormats.fontFamily)?.name || 'Font' : 
+                'Font'
+              }
+            </span>
+            <ChevronDown className="w-3 h-3" />
+          </button>
 
-        {/* Font Size Dropdown - Updated */}
+          {showFontFamilyDropdown && (
+            <div className="absolute top-full left-0 mt-1 bg-white border rounded-lg shadow-lg z-10 min-w-[150px] max-h-64 overflow-y-auto">
+              {fontFamilies.map((font) => (
+                <button
+                  key={font.value}
+                  type="button"
+                  onClick={() => setFontFamily(font.value)}
+                  className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm ${activeFormats.fontFamily === font.value ? 'bg-gray-100' : ''}`}
+                  style={{ fontFamily: font.value === 'default' ? 'inherit' : font.value }}
+                >
+                  {font.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="w-px h-8 bg-gray-300 mx-1" />
+
+        {/* Font Size Dropdown */}
         <div className="relative">
           <button
             type="button"
@@ -369,15 +427,6 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
             </div>
           )}
         </div>
-
-        {/* ... (rest of your toolbar and editor content) */}
-      </div>
-
-      {/* Editor Content */}
-      
-
-      {/* ... (rest of your component) */}
-    </div>
 
         <div className="w-px h-8 bg-gray-300 mx-1" />
 
@@ -665,17 +714,19 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
       </div>
 
       {/* Editor Content */}
-      <div className="min-h-[200px] p-4">
+      <div className={`min-h-[300px] p-4 ${className}`}>
         <EditorContent editor={editor} placeholder={placeholder} />
       </div>
 
       {/* Click outside to close dropdowns */}
-      {(showHeadingDropdown || showTextColorPicker || showBgColorPicker || showFontSizeDropdown || showSpecialChars) && (
+      {(showHeadingDropdown || showTextColorPicker || showBgColorPicker || 
+       showFontSizeDropdown || showFontFamilyDropdown || showSpecialChars) && (
         <div className="fixed inset-0 z-0" onClick={() => {
           setShowHeadingDropdown(false)
           setShowTextColorPicker(false)
           setShowBgColorPicker(false)
           setShowFontSizeDropdown(false)
+          setShowFontFamilyDropdown(false)
           setShowSpecialChars(false)
         }} />
       )}
@@ -684,6 +735,5 @@ const TiptapEditor = ({ value, onChange, placeholder = "Start typing..." }) => {
 }
 
 export default TiptapEditor
-
 
 // npm install @tiptap/react @tiptap/starter-kit @tiptap/extension-link @tiptap/extension-image @tiptap/extension-text-align @tiptap/extension-text-style @tiptap/extension-color @tiptap/extension-highlight @tiptap/extension-horizontal-rule @tiptap/extension-character-count @tiptap/extension-table @tiptap/extension-table-cell @tiptap/extension-table-header @tiptap/extension-table-row lucide-react

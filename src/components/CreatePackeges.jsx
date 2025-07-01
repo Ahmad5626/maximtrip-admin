@@ -557,7 +557,7 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
                   placeholder="Enter location"
                 />
               </div>
-
+{/* 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Featured</label>
                 <select
@@ -569,9 +569,9 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
                   <option value="No">No</option>
                   <option value="Yes">Yes</option>
                 </select>
-              </div>
+              </div> */}
 
-              {/* <div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Show in slider</label>
                 <select
                   name="showInSlider"
@@ -582,7 +582,7 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
                   <option value="No">No</option>
                   <option value="Yes">Yes</option>
                 </select>
-              </div> */}
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Package Category *</label>
@@ -851,6 +851,7 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
                   <div key={index} className="flex gap-2 mb-2">
                     <input
                       type="text"
+                   
                       value={term}
                       onChange={(e) => handleArrayChange("termsAndConditions", index, e.target.value)}
                       className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#ce3c3d]"

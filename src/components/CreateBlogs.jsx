@@ -310,6 +310,7 @@ const CreateBlogs = () => {
                 value={createBlogFormData.description || ""}
                 onChange={handleContentChange}
                 placeholder="Write your blog content here..."
+                className="max-h-[300px] overflow-y-auto"
               />
             </div>
 
@@ -622,6 +623,7 @@ const CreateBlogs = () => {
                     value={editDescriptionContent}
                     onChange={handleEditDescriptionChange}
                     placeholder="Enter blog content..."
+                    className="max-h-[300px] overflow-y-auto"
                   />
                 </div>
 

@@ -310,6 +310,7 @@ const CreatePages = () => {
                 value={createPageFormData.description || ""}
                 onChange={handleContentChange}
                 placeholder="Write your Page content here..."
+                className="max-h-[300px] overflow-y-auto"
               />
             </div>
 
@@ -622,6 +623,7 @@ const CreatePages = () => {
                     value={editDescriptionContent}
                     onChange={handleEditDescriptionChange}
                     placeholder="Enter page content..."
+                    className="max-h-[300px] overflow-y-auto"
                   />
                 </div>
 

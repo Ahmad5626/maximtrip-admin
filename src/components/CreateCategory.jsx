@@ -275,6 +275,7 @@ const CreatePackeges = () => {
                 value={createCategoryFormData.detail || ""}
                 onChange={handleDetailChange}
                 placeholder="Enter detailed description..."
+                className="max-h-[300px] overflow-y-auto"
               />
             </div>
 
@@ -284,6 +285,7 @@ const CreatePackeges = () => {
                 value={createCategoryFormData.subcategoryFAQ || ""}
                 onChange={handleSubcategoryFAQChange}
                 placeholder="Enter FAQ content..."
+                className="max-h-[300px] overflow-y-auto"
               />
             </div>
 
@@ -522,12 +524,13 @@ const CreatePackeges = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 ">
                   <label className="font-semibold text-xs text-gray-500">Detail</label>
                   <TiptapEditor
                     value={editDetailContent}
                     onChange={setEditDetailContent}
                     placeholder="Enter detailed description..."
+                    className="max-h-[300px] overflow-y-auto"
                   />
                 </div>
 
@@ -537,6 +540,7 @@ const CreatePackeges = () => {
                     value={editSubcategoryFAQContent}
                     onChange={setEditSubcategoryFAQContent}
                     placeholder="Enter FAQ content..."
+                    className="max-h-[300px] overflow-y-auto"
                   />
                 </div>
 
