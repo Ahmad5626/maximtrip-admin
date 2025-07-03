@@ -1,3 +1,3 @@
-export const baseApi = "http://localhost:7000";
+export const baseApi = "https://api.maximtrip.com";
 
 // https://api.maximtrip.com
