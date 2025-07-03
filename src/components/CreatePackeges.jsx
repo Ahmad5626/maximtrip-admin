@@ -27,6 +27,7 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
     shortDescription: "",
     longDescription: "",
     cancellationPolicies: "",
+    termsAndConditions: "",
   })
 
   useEffect(() => {
@@ -42,6 +43,7 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
         shortDescription: initialData.shortDescription || "",
         longDescription: initialData.longDescription || "",
         cancellationPolicies: initialData.cancellationPolicies || "",
+        termsAndConditions: initialData.termsAndConditions || "",
       })
       // Set image previews if editing
       if (initialData.featureImage) {
@@ -294,7 +296,7 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
       itinerary: [],
       inclusions: [""],
       exclusions: [""],
-      termsAndConditions: [""],
+     
     })
     setRichTextContent({
       highlights: "",
@@ -305,6 +307,7 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
       shortDescription: "",
       longDescription: "",
       cancellationPolicies: "",
+      termsAndConditions: "",
     })
     setFeatureImagePreview("")
     setExtraFilePreview("")
@@ -847,33 +850,12 @@ const PackageForm = ({ initialData = null, onSubmit, categories = [] }) => {
               {/* Terms and Conditions */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Terms & Conditions</label>
-                {formData.termsAndConditions?.map((term, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                   
-                      value={term}
-                      onChange={(e) => handleArrayChange("termsAndConditions", index, e.target.value)}
-                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#ce3c3d]"
-                      placeholder="Enter term or condition"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem("termsAndConditions", index)}
-                      className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addArrayItem("termsAndConditions")}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#ce3c3d] text-white rounded-lg hover:bg-[#ce3c3d]"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Term
-                </button>
+                  <TiptapEditor
+                  value={richTextContent.termsAndConditions}
+                  onChange={(content) => handleRichTextChange("termsAndConditions", content)}
+                  placeholder="Enter package highlights..."
+                />
+               
               </div>
             </div>
           )}

@@ -418,7 +418,7 @@ function App() {
         itinerary: editedItem.itinerary || [],
         inclusions: editedItem.inclusions?.filter((item) => item.trim() !== "") || [],
         exclusions: editedItem.exclusions?.filter((item) => item.trim() !== "") || [],
-        termsAndConditions: editedItem.termsAndConditions?.filter((item) => item.trim() !== "") || [],
+        termsAndConditions: editedItem.termsAndConditions
       }
 
       console.log("Updating package with data:", updateData)
@@ -1299,19 +1299,14 @@ function App() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Terms and Conditions (Comma Separated)
+                    Terms and Conditions 
                   </label>
-                  <input
-                    type="text"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={(editedItem?.termsAndConditions || []).join(", ")}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "termsAndConditions",
-                        e.target.value.split(",").map((item) => item.trim()),
-                      )
-                    }
-                    placeholder="Enter terms and conditions, separated by commas"
+                  <TiptapEditor
+                    className="max-h-[300px] overflow-y-auto w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={4}
+                    value={editedItem?.termsAndConditions || ""}
+                    onChange={(content) => handleInputChange("termsAndConditions", content)}
+                    placeholder="Enter package hotel"
                   />
                 </div>
               </div>
