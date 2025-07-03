@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
         itinerary: [],
         inclusions: [''],
         exclusions: [''],
-        termsAndConditions: [''],
+        termsAndConditions: '',
         highlights: [''],
     
        

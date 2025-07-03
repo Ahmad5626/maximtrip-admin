@@ -679,12 +679,12 @@ function App() {
                   {visibleColumns.exclusions && (
                     <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[150px]">Exclusions</th>
                   )}
-
+{/* 
                   {visibleColumns.termsAndConditions && (
                     <th className="px-6 py-4 text-left font-semibold text-gray-900 min-w-[150px]">
                       Terms & Conditions
                     </th>
-                  )}
+                  )} */}
 
                   <th className="px-6 py-4 text-right font-semibold text-gray-900 w-20">Actions</th>
                 </tr>
@@ -813,7 +813,7 @@ function App() {
                         </td>
                       )}
 
-                      {visibleColumns.termsAndConditions && (
+                      {/* {visibleColumns.termsAndConditions && (
                         <td className="px-6 py-4">
                           {item.termsAndConditions && item.termsAndConditions.length > 0 ? (
                             <div className="text-sm text-gray-600">
@@ -821,14 +821,14 @@ function App() {
                                 {item.termsAndConditions.length} terms
                               </span>
                               <div className="mt-1 text-xs text-gray-500 truncate max-w-[120px]">
-                                {item.termsAndConditions[0]}
+                                {item.termsAndConditions}
                               </div>
                             </div>
                           ) : (
                             <span className="text-gray-400 text-sm">No terms</span>
                           )}
                         </td>
-                      )}
+                      )} */}
 
                       <td className="px-6 py-4 text-right relative">
                         <button
